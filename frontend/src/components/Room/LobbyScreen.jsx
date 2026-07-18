@@ -120,13 +120,15 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
               ].map((c, i) => {
                 const isTaken = players.some(p => p.uid !== myPlayer.uid && p.color === c);
                 const isSelected = myPlayer.color === c;
+                // Generate a pseudo-random looking deterministic rotation between roughly -35 and +35
+                const rotation = (i % 2 === 0 ? 1 : -1) * (8 + (i * 17) % 25);
                 return (
                   <div
                     key={c}
                     className={`swatch ${isSelected ? "selected" : ""} ${isTaken ? "taken" : ""}`}
                     style={{
                       backgroundColor: c,
-                      transform: `rotate(${i % 2 === 0 ? 5 : -5}deg)`,
+                      transform: `rotate(${rotation}deg)`,
                       cursor: isTaken ? "not-allowed" : "pointer"
                     }}
                     onClick={() => {
@@ -189,8 +191,8 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
 
       {showSettings && (
         <div className="modal-scrim open" style={{ zIndex: 100 }}>
-          <div className="shape-citadel play theme-word" style={{ maxWidth: '400px', width: '90%', border: '1px solid var(--brass)' }}>
-            <span className="popup-header-label">Studio Settings</span>
+          <div className="shape-citadel play theme-word" style={{ maxWidth: '400px', width: '90%', border: '2px solid var(--brass)', background: 'var(--studio-wall)' }}>
+            <span className="popup-header-label" style={{ color: 'var(--brass)' }}>Studio Settings</span>
             <div style={{ textAlign: "left", marginTop: "24px", padding: "0 24px" }}>
               
               <div style={{ marginBottom: "24px" }}>
