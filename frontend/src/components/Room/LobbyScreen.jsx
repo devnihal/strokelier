@@ -68,13 +68,30 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
 
           <div className="lobby-actions">
             {isOwner ? (
-              <Button
-                onClick={handleStartGame}
-                variant="primary"
-                style={{ width: "100%", marginTop: "24px" }}
-              >
-                Commence Session
-              </Button>
+              <>
+                <Button
+                  onClick={handleStartGame}
+                  variant="primary"
+                  style={{ width: "100%", marginTop: "24px", opacity: (players.length + Object.keys(roomState.spectators || {}).length) < 2 ? 0.5 : 1 }}
+                  disabled={(players.length + Object.keys(roomState.spectators || {}).length) < 2}
+                >
+                  Commence Session
+                </Button>
+                {(players.length + Object.keys(roomState.spectators || {}).length) < 2 && (
+                  <p style={{ fontSize: "12px", color: "var(--bone-muted)", marginTop: "8px", textAlign: "center" }}>
+                    Need at least 2 people to start
+                  </p>
+                )}
+                {roomState.gamesPlayed >= 1 && (
+                  <Button
+                    onClick={() => socket.emit("GAME_END")}
+                    variant="danger"
+                    style={{ width: "100%", marginTop: "12px", borderColor: "var(--crimson)", color: "var(--crimson)" }}
+                  >
+                    End Game
+                  </Button>
+                )}
+              </>
             ) : (
               <p className="waiting-msg" style={{ marginTop: "24px" }}>
                 Waiting for host to commence...
@@ -148,6 +165,7 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                       style={{ backgroundColor: p.color }}
                     ></div>
                     <span className="roster-name">{p.name}</span>
+                    <span className="roster-score" style={{ marginLeft: "8px", fontSize: "14px", color: "var(--bone-muted)" }}>{p.score} pts</span>
                     <span className="roster-leader"></span>
                     {p.isRoomOwner && <span className="roster-tag">HOST</span>}
                   </div>

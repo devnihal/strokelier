@@ -78,3 +78,82 @@
 .action-buttons button {
   width: 100%;
 }
+
+/* Bouncing Dots Animation */
+.bouncing-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bouncing-dots .dot {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.bouncing-dots .dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.bouncing-dots .dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Server Status Indicator */
+.server-status-indicator {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--bone-muted);
+  z-index: 50;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.server-status-text {
+  margin-left: 8px;
+  max-width: 150px;
+  opacity: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: max-width 0.4s ease, opacity 0.4s ease, margin-left 0.4s ease;
+}
+
+.server-status-text.hidden {
+  max-width: 0;
+  opacity: 0;
+  margin-left: 0;
+}
+
+.server-status-indicator.status-checking {
+  color: #D4AC52; /* brass / orange */
+}
+
+.server-status-indicator.status-online {
+  color: #6B9A6B; /* wax-green */
+}
+
+.server-status-indicator.status-offline {
+  color: #C2453A; /* wax-red */
+}
+

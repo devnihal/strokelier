@@ -6,6 +6,7 @@ import LobbyScreen from "./LobbyScreen";
 import CanvasScreen from "./CanvasScreen";
 import VotingScreen from "./VotingScreen";
 import ResultsScreen from "./ResultsScreen";
+import LeaderboardScreen from "./LeaderboardScreen";
 import "../../styles/Room/RoomScreen.css";
 
 function CountdownOverlay({ seconds, message, onComplete }) {
@@ -79,7 +80,9 @@ export default function RoomScreen() {
       "ROOM_JOIN",
       { roomCode: code, name: playerName },
       (response) => {
-        if (response.error) {
+        if (response.success === false && response.error) {
+          setError(response.error);
+        } else if (response.error) {
           setError(response.error);
         } else {
           setRoomState(response.state);
@@ -193,10 +196,20 @@ export default function RoomScreen() {
 
   if (error) {
     return (
-      <div className="room-error">
-        <h2>Cannot join room</h2>
-        <p>{error}</p>
-        <button onClick={() => navigate("/")} style={{ fontFamily: 'var(--font-ui)', fontWeight: 500, fontSize: '14px', background: 'transparent', border: '1px solid var(--brass)', color: 'var(--brass)', padding: '14px 28px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Go Home</button>
+      <div className="room-screen-container">
+        <div className="modal-scrim open" style={{ zIndex: 100 }}>
+          <div className="shape-citadel play theme-word" style={{ maxWidth: '400px', width: '90%', border: '1px solid var(--brass)' }}>
+            <span className="popup-header-label">Error</span>
+            <div style={{ padding: "32px 24px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-serif)", fontSize: "18px", color: "var(--graphite)", marginBottom: "32px" }}>
+                {error}
+              </p>
+              <button onClick={() => window.location.href = '/'} style={{ fontFamily: 'var(--font-ui)', fontWeight: 500, fontSize: '14px', background: 'transparent', border: '1px solid var(--brass)', color: 'var(--brass)', padding: '14px 28px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Return to Home
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -263,6 +276,14 @@ export default function RoomScreen() {
       case "RESULTS":
         return (
           <ResultsScreen
+            roomState={roomState}
+            myPlayer={myPlayer}
+            socket={socket}
+          />
+        );
+      case "LEADERBOARD":
+        return (
+          <LeaderboardScreen
             roomState={roomState}
             myPlayer={myPlayer}
             socket={socket}

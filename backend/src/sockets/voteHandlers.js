@@ -93,6 +93,8 @@ function triggerReveal(room, io) {
   const players = Array.from(room.players.values());
   const votes = Object.fromEntries(room.votes);
   const scoreUpdates = calculateScores(players, votes, room.imposterUid);
+  room.lastScoreUpdates = scoreUpdates;
+  room.gamesPlayed++;
 
   // Apply score updates to players
   for (const player of players) {

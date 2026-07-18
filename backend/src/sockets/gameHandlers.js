@@ -104,6 +104,33 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
     socket.to(context.room.code).emit('DRAW_STROKE_POINT_BROADCAST', { x, y });
   });
 
+  socket.on('GAME_RETURN_LOBBY', () => {
+    const context = getActiveRoomAndValidateTurn(socket);
+    if (!context) return;
+    const { room } = context;
+    if (room.state !== 'RESULTS' && room.state !== 'LEADERBOARD') return;
+
+    if (room.state === 'LEADERBOARD') {
+      room.gamesPlayed = 0;
+      for (const p of room.players.values()) {
+        p.score = 0;
+      }
+    }
+
+    room.state = 'LOBBY';
+    io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
+  });
+
+  socket.on('GAME_END', () => {
+    const roomCode = socket.data.roomCode;
+    const room = activeRooms.get(roomCode);
+    if (!room || room.ownerUid !== socket.data.uid) return;
+    if (room.state !== 'LOBBY' || room.gamesPlayed < 1) return;
+
+    room.state = 'LEADERBOARD';
+    io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
+  });
+
   socket.on('DRAW_STROKE_END', () => {
     const context = getActiveRoomAndValidateTurn(socket);
     if (!context || !context.room.pendingStroke) return;

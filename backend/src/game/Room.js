@@ -31,6 +31,7 @@ class Room {
     this.votes = new Map(); // voterUid -> votedUid
     this.createdAt = Date.now();
     this.emptySince = null;
+    this.gamesPlayed = 0;
   }
 
   /**
@@ -58,9 +59,11 @@ class Room {
       // Imposter and word are hidden from the public state UNLESS the game is over
       imposterUid: this.state === 'RESULTS' ? this.imposterUid : undefined,
       currentWord: this.state === 'RESULTS' ? this.currentWord : undefined,
+      lastScoreUpdates: this.state === 'RESULTS' ? this.lastScoreUpdates : undefined,
       drawOrder: this.drawOrder,
       currentTurnIndex: this.currentTurnIndex,
       currentRoundNumber: this.currentRoundNumber,
+      gamesPlayed: this.gamesPlayed,
       strokes: this.strokes,
       pendingStroke: this.pendingStroke,
       votes: Object.fromEntries(this.votes),

@@ -46,6 +46,7 @@ export default function ResultsScreen({ roomState, myPlayer, socket }) {
       <div className="reveal-row">
         {players.map((p) => {
           const isImposter = p.uid === imposterUid;
+          const increment = roomState.lastScoreUpdates ? (roomState.lastScoreUpdates[p.uid] || 0) : 0;
           return (
             <div
               key={p.uid}
@@ -55,7 +56,7 @@ export default function ResultsScreen({ roomState, myPlayer, socket }) {
 
               <div className="seal" style={{ backgroundColor: p.color }}></div>
               <div className="artist-title">{p.name}</div>
-              <div className="artist-points">+{p.score} PTS</div>
+              <div className="artist-points">+{increment} PTS</div>
             </div>
           );
         })}
