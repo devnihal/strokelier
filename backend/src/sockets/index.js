@@ -1,14 +1,29 @@
+const registerRoomHandlers = require('./roomHandlers');
+
+/**
+ * Attaches middleware to the socket server.
+ */
+function setupSocketMiddleware(io) {
+  io.use((socket, next) => {
+    const uid = socket.handshake.auth?.uid;
+    if (!uid) {
+      return next(new Error('Authentication error: uid required'));
+    }
+    socket.data.uid = uid;
+    next();
+  });
+}
+
 /**
  * Central registry for Socket.IO handlers.
  * Attaches handlers to each incoming connection.
- *
- * @param {import("socket.io").Server} io - The socket.io server instance
- * @param {import("socket.io").Socket} socket - The connected socket instance
  */
-function registerHandlers(io, socket) {
+function registerHandlers(io, socket, activeRooms) {
+  registerRoomHandlers(io, socket, activeRooms);
+
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
   });
 }
 
-module.exports = { registerHandlers };
+module.exports = { registerHandlers, setupSocketMiddleware };
