@@ -1,5 +1,5 @@
-import React from 'react';
-import '../../styles/common/Button.css';
+import React from "react";
+import "../../styles/common/Button.css";
 
 /**
  * Common button component following the Atelier After Hours design system.
@@ -13,19 +13,19 @@ import '../../styles/common/Button.css';
  * @param {function} [props.onClick]
  * @param {string} [props.className]
  */
-export default function Button({ 
-  variant = 'primary', 
-  children, 
-  onClick, 
-  className = '', 
-  ...rest 
+export default function Button({
+  variant = "primary",
+  children,
+  onClick,
+  className = "",
+  ...rest
 }) {
-  const baseClass = 'btn';
-  const variantClass = variant === 'danger' ? 'variant-danger' : '';
-  
+  const baseClass = "btn";
+  const variantClass = variant === "danger" ? "variant-danger" : "";
+
   return (
-    <button 
-      className={`${baseClass} ${variantClass} ${className}`.trim()} 
+    <button
+      className={`${baseClass} ${variantClass} ${className}`.trim()}
       onClick={onClick}
       {...rest}
     >

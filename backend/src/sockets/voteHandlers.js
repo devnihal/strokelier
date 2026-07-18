@@ -17,13 +17,13 @@ module.exports = function registerVoteHandlers(io, socket, activeRooms) {
     if (!room || room.state !== 'VOTING') return;
 
     const player = room.players.get(uid);
-    if (!player || player.isImposter) return; // Imposters cannot vote
+    if (!player) return;
 
     // Record the vote
     room.votes.set(uid, votedUid);
 
-    // Check if everyone eligible has voted
-    const eligibleVotersCount = Array.from(room.players.values()).filter(p => !p.isImposter).length;
+    // Check if everyone has voted
+    const eligibleVotersCount = room.players.size;
     
     io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
 

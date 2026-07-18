@@ -40,11 +40,12 @@
 }
 
 .player-item .color-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 58% 42% 38% 62% / 62% 55% 45% 38%;
+  /* margin-right: 12px; */
   flex-shrink: 0;
+  transform: rotate(6deg);
 }
 
 .player-info {
@@ -70,21 +71,39 @@
   gap: 8px;
 }
 
-.badge {
-  font-family: var(--font-code);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  padding: 2px 4px;
-  border-radius: 2px;
-  text-transform: uppercase;
+.icon-brush {
+  animation: drawMotion 3s infinite;
+  transform-origin: 30% 70%;
 }
 
-.badge.owner {
-  color: var(--brass);
-  border: 1px solid var(--brass);
-}
-
-.badge.drawing {
-  color: var(--wax-red);
-  border: 1px solid var(--wax-red);
+@keyframes drawMotion {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.95);
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+    animation-timing-function: ease-in;
+  }
+  20% {
+    transform: translate(-2px, 1px) rotate(-10deg) scale(1);
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+    animation-timing-function: ease-out;
+  }
+  45% {
+    transform: translate(3px, -1px) rotate(8deg) scale(1.02);
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+    animation-timing-function: ease-in-out;
+  }
+  70% {
+    transform: translate(-1px, 2px) rotate(-6deg) scale(1);
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));
+    animation-timing-function: ease-out;
+  }
+  85% {
+    transform: translate(1px, -1px) rotate(2deg) scale(0.97);
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(0.95);
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,0.4));
+  }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 /**
  * Common Logo component rendering the brand mark.
@@ -7,18 +7,18 @@ import React from 'react';
  * @param {Object} props
  * @param {string} [props.className] - Optional extra class names
  */
-export default function Logo({ className = '' }) {
+export default function Logo({ className = "" }) {
   return (
-    <h1 
-      className={className} 
+    <h1
+      className={className}
       style={{
-        fontFamily: 'var(--font-heading)',
+        fontFamily: "var(--font-heading)",
         fontWeight: 600,
-        fontSize: '52px',
+        fontSize: "52px",
         margin: 0,
-        letterSpacing: '-0.02em',
-        color: 'var(--brass)',
-        textAlign: 'center'
+        letterSpacing: "-0.02em",
+        color: "var(--brass)",
+        textAlign: "center",
       }}
     >
       strokelier

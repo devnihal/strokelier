@@ -1,51 +1,81 @@
-import React from 'react';
-import Button from '../common/Button';
-import StrokeDivider from '../common/StrokeDivider';
-import '../../styles/Room/ResultsScreen.css';
+import React from "react";
+import Button from "../common/Button";
+import StrokeDivider from "../common/StrokeDivider";
+import "../../styles/Room/ResultsScreen.css";
 
 export default function ResultsScreen({ roomState, myPlayer, socket }) {
   const isOwner = myPlayer?.isRoomOwner;
   const imposterUid = roomState.imposterUid;
-  const imposterPlayer = roomState.players[imposterUid];
+  const word = roomState.currentWord;
+  const players = Object.values(roomState.players).sort(
+    (a, b) => b.score - a.score,
+  );
 
-  const players = Object.values(roomState.players).sort((a, b) => b.score - a.score);
+  const handleNextRound = () => {
+    socket.emit("GAME_NEXT_ROUND"); // assuming backend supports this or GAME_RESTART
+  };
 
+  const handleReturnLobby = () => {
+    socket.emit("GAME_RETURN_LOBBY"); // assuming backend supports this
+  };
+
+  // If backend only supports GAME_RESTART:
   const handleNewGame = () => {
-    socket.emit('GAME_RESTART');
+    socket.emit("GAME_RESTART");
   };
 
   return (
     <div className="results-screen">
-      <div className="results-header">
-        <h1 className="reveal-title">The Imposter Was...</h1>
-        <StrokeDivider color="var(--wax-red)" />
-        <h2 className="imposter-name" style={{ color: imposterPlayer?.color || 'var(--wax-red)' }}>
-          {imposterPlayer?.name}
-        </h2>
-        <p className="word-reveal">The word was: <span className="highlight">{roomState.currentWord}</span></p>
+      <div className="word-reveal">
+        <p
+          style={{
+            fontFamily: "var(--font-code)",
+            fontSize: "16px",
+            color: "var(--bone-muted)",
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            margin: "0 0 8px 0",
+          }}
+        >
+          The word was:
+        </p>
+        <h1 className="revealed-word">{word}</h1>
+        <StrokeDivider color="var(--brass)" />
       </div>
 
-      <div className="scoreboard">
-        <h3>Final Scores</h3>
-        <div className="score-list">
-          {players.map((p, index) => (
-            <div key={p.uid} className={`score-row ${p.uid === imposterUid ? 'is-imposter' : ''}`}>
-              <span className="rank">#{index + 1}</span>
-              <div className="color-swatch" style={{ backgroundColor: p.color }}></div>
-              <span className="player-name">{p.name}</span>
-              <span className="score-val">{p.score} pts</span>
+      <div className="reveal-row">
+        {players.map((p) => {
+          const isImposter = p.uid === imposterUid;
+          return (
+            <div
+              key={p.uid}
+              className={`reveal-card-sketch ${isImposter ? "forger" : ""}`}
+            >
+              {isImposter && <div className="stamp forger-stamp">Forger</div>}
+
+              <div className="seal" style={{ backgroundColor: p.color }}></div>
+              <div className="artist-title">{p.name}</div>
+              <div className="artist-points">+{p.score} PTS</div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
-      {isOwner ? (
-        <div className="results-actions">
+      <div
+        className="results-actions"
+        style={{
+          marginTop: "40px",
+          display: "flex",
+          gap: "16px",
+          justifyContent: "center",
+        }}
+      >
+        {isOwner ? (
           <Button onClick={handleNewGame}>Play Again (Same Room)</Button>
-        </div>
-      ) : (
-        <p className="waiting-msg">Waiting for host to start a new game...</p>
-      )}
+        ) : (
+          <p className="waiting-msg">Waiting for host to start a new game...</p>
+        )}
+      </div>
     </div>
   );
 }

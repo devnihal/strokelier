@@ -65,6 +65,21 @@ module.exports = function registerRoomHandlers(io, socket, activeRooms) {
     }
   });
 
+  socket.on('UPDATE_COLOR', ({ color }) => {
+    const roomCode = socket.data.roomCode;
+    const uid = socket.data.uid;
+    if (roomCode && uid) {
+      const room = activeRooms.get(roomCode);
+      if (room && room.state === 'LOBBY' && VALID_COLORS.includes(color)) {
+        const player = room.getPlayer(uid);
+        if (player) {
+          player.color = color;
+          io.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
+        }
+      }
+    }
+  });
+
   /**
    * Handle explicit leave or kick
    */

@@ -1,34 +1,96 @@
 .room-screen {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
+  position: relative;
 }
 
-.room-error,
-.room-loading {
+.room-error, .room-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 24px;
-  text-align: center;
+  gap: 16px;
+  font-family: var(--font-ui);
+  color: var(--bone);
 }
 
 .room-error h2 {
   color: var(--wax-red);
   font-family: var(--font-heading);
-  margin-bottom: 8px;
 }
 
-.room-error button {
-  margin-top: 24px;
-  padding: 12px 24px;
-  background: transparent;
-  border: 1px solid var(--bone-muted);
-  color: var(--bone);
-  cursor: pointer;
-  font-family: var(--font-ui);
+/* Page Transitions */
+.screen-transition-wrapper {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  transition: opacity 300ms var(--ease-micro);
+}
+
+.screen-transition-wrapper.fade-in {
+  opacity: 1;
+}
+
+.screen-transition-wrapper.fade-out {
+  opacity: 0;
+}
+
+/* Countdown Overlay */
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 20, 22, 0.9); /* Graphite with 0.9 opacity */
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  animation: overlayFadeIn 300ms var(--ease-micro) forwards;
+}
+
+.countdown-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdown-msg {
+  font-family: var(--font-code);
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--brass);
   text-transform: uppercase;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.countdown-number {
+  font-family: var(--font-heading);
+  font-size: 120px;
+  color: var(--bone);
+  margin: 0;
+  line-height: 1;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: popIn 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }

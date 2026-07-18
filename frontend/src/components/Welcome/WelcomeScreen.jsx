@@ -1,36 +1,45 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../common/Button';
-import { BACKEND_URL } from '../../config/api';
-import '../../styles/Welcome/WelcomeScreen.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "../common/Button";
+import { usePlayerSession } from "../../context/PlayerSessionContext";
+import "../../styles/Welcome/WelcomeScreen.css";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();
-  const [name, setName] = useState(localStorage.getItem('strokelier_name') || '');
-  const [roomCode, setRoomCode] = useState('');
-  const [error, setError] = useState('');
+  const { uid } = usePlayerSession();
+  const [name, setName] = useState(
+    localStorage.getItem("strokelier_name") || "",
+  );
+  const [roomCode, setRoomCode] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNameChange = (e) => {
     setName(e.target.value);
-    localStorage.setItem('strokelier_name', e.target.value);
+    localStorage.setItem("strokelier_name", e.target.value);
   };
 
   const handleCreateGame = async () => {
     if (!name.trim()) {
-      setError('Please enter a name first.');
+      setError("Please enter a name first.");
       return;
     }
-    
+
     setIsSubmitting(true);
-    setError('');
+    setError("");
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/room/create`, { method: 'POST' });
+      const res = await fetch(`${BACKEND_URL}/api/room/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid, name }),
+      });
       const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || 'Failed to create room');
-      
+
+      if (!res.ok) throw new Error(data.error || "Failed to create room");
+
       navigate(`/room/${data.roomCode}`);
     } catch (err) {
       setError(err.message);
@@ -40,24 +49,24 @@ export default function WelcomeScreen() {
 
   const handleJoinGame = async () => {
     if (!name.trim()) {
-      setError('Please enter a name first.');
+      setError("Please enter a name first.");
       return;
     }
-    
+
     const code = roomCode.trim();
     if (code.length !== 6) {
-      setError('Room code must be 6 digits.');
+      setError("Room code must be 6 digits.");
       return;
     }
 
     setIsSubmitting(true);
-    setError('');
+    setError("");
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/room/${code}/verify`);
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Failed to join room');
+      if (!res.ok) throw new Error(data.error || "Failed to join room");
 
       navigate(`/room/${code}`);
     } catch (err) {
@@ -69,14 +78,16 @@ export default function WelcomeScreen() {
   return (
     <div className="welcome-screen">
       <h1>STROKELIER</h1>
-      <p className="tagline">ATELIER SESSION LEDGER // PHYSICAL INK PARAMETERS</p>
-      
+      <p className="tagline">
+        ATELIER SESSION LEDGER // PHYSICAL INK PARAMETERS
+      </p>
+
       <div className="action-form">
         <div className="input-group">
           <label>Your Alias</label>
-          <input 
-            type="text" 
-            placeholder="Name..." 
+          <input
+            type="text"
+            placeholder="Name..."
             value={name}
             onChange={handleNameChange}
             maxLength={20}
@@ -84,28 +95,46 @@ export default function WelcomeScreen() {
           />
         </div>
 
-        {error && <div style={{ color: 'var(--wax-red)', fontSize: '14px' }}>{error}</div>}
+        {error && (
+          <div style={{ color: "var(--wax-red)", fontSize: "14px" }}>
+            {error}
+          </div>
+        )}
 
         <div className="action-buttons">
-          <Button onClick={handleCreateGame} disabled={isSubmitting || !name} variant="primary">
+          <Button
+            onClick={handleCreateGame}
+            disabled={isSubmitting || !name}
+            variant="primary"
+          >
             Create Studio
           </Button>
         </div>
 
-        <div className="input-group" style={{ marginTop: '24px' }}>
+        <div className="input-group" style={{ marginTop: "24px" }}>
           <label>Access Code</label>
-          <input 
-            type="text" 
-            placeholder="6-DIGIT CODE" 
+          <input
+            type="text"
+            placeholder="6-DIGIT CODE"
             value={roomCode}
-            onChange={(e) => setRoomCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            onChange={(e) =>
+              setRoomCode(
+                e.target.value
+                  .replace(/[^A-Za-z0-9]/g, "")
+                  .slice(0, 6)
+                  .toUpperCase(),
+              )
+            }
             maxLength={6}
             disabled={isSubmitting}
           />
         </div>
 
         <div className="action-buttons">
-          <Button onClick={handleJoinGame} disabled={isSubmitting || !name || roomCode.length !== 6}>
+          <Button
+            onClick={handleJoinGame}
+            disabled={isSubmitting || !name || roomCode.length !== 6}
+          >
             Join Studio
           </Button>
         </div>

@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 36px;
   width: 100%;
   max-width: 320px;
 }
@@ -37,7 +37,7 @@
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
   text-align: left;
 }
@@ -57,9 +57,10 @@
   border-bottom: 1px solid var(--bone-muted);
   color: var(--bone);
   font-family: var(--font-hand);
-  font-size: 24px;
-  padding: 8px 0;
+  font-size: 32px;
+  padding: 12px 0;
   text-align: center;
+  transition: border-bottom-color 140ms;
 }
 
 .input-group input:focus {
@@ -72,7 +73,6 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  margin-top: 24px;
 }
 
 .action-buttons button {

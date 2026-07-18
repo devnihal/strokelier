@@ -14,19 +14,9 @@ const CONSTANTS = {
 
   // Valid wax-seal colors for players (from spec)
   VALID_COLORS: [
-    '#B23A2E', // Seal Red
-    '#5C7A4A', // Moss
-    '#4C6B8A', // Ink Blue
-    '#7A4A6B', // Plum
-    '#CBA045', // Brass
-    '#6B7580', // Slate
-    '#A85C32', // Rust
-    '#3D7A72', // Teal Ink
-    '#C9836B', // Blush Clay
-    '#8A8148', // Olive
-    '#7385B8', // Periwinkle
-    '#9E5A6B', // Charcoal Rose
-  ],
+    '#D94132', '#5C8AB3', '#E5B85C', '#A85C32', '#C9836B', '#7385B8', 
+    '#6BB36B', '#7A4A6B', '#6B7580', '#3D7A72', '#8A8148', '#9E5A6B'
+  ]
 };
 
 module.exports = CONSTANTS;
