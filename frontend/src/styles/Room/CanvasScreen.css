@@ -156,14 +156,21 @@
 }
 
 .tool-group input[type="range"]::-webkit-slider-thumb {
-  height: 20px;
-  width: 20px;
+  width: calc(16px + var(--thickness));
+  height: calc(16px + var(--thickness));
   border-radius: 50%;
-  background: var(--brass);
+  background: radial-gradient(
+    circle, 
+    var(--graphite) 0%, 
+    var(--graphite) calc(var(--thickness) / 2), 
+    var(--bone) calc((var(--thickness) / 2) + 0.5px), 
+    var(--bone) 100%
+  );
   cursor: pointer;
   -webkit-appearance: none;
-  margin-top: -7px;
-  border: 2px solid var(--graphite);
+  margin-top: calc(3px - (16px + var(--thickness)) / 2);
+  border: 1px solid var(--graphite);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 /* Firefox */
@@ -176,12 +183,19 @@
 }
 
 .tool-group input[type="range"]::-moz-range-thumb {
-  height: 20px;
-  width: 20px;
+  width: calc(16px + var(--thickness));
+  height: calc(16px + var(--thickness));
   border-radius: 50%;
-  background: var(--brass);
+  background: radial-gradient(
+    circle, 
+    var(--graphite) 0%, 
+    var(--graphite) calc(var(--thickness) / 2), 
+    var(--bone) calc((var(--thickness) / 2) + 0.5px), 
+    var(--bone) 100%
+  );
   cursor: pointer;
-  border: 2px solid var(--graphite);
+  border: 1px solid var(--graphite);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 
 .tool-group.colors {

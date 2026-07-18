@@ -1,6 +1,31 @@
 import React from "react";
 import "../../styles/Room/ScoreboardSidebar.css";
 
+const DisconnectTimer = ({ disconnectTime }) => {
+  const [timeLeft, setTimeLeft] = React.useState(10);
+  
+  React.useEffect(() => {
+    if (!disconnectTime) return;
+    
+    const updateTimer = () => {
+      const elapsed = Math.floor((Date.now() - disconnectTime) / 1000);
+      setTimeLeft(Math.max(0, 10 - elapsed));
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [disconnectTime]);
+
+  if (timeLeft === 0) return null;
+
+  return (
+    <span style={{ color: '#d9534f', fontSize: '12px', fontWeight: 'bold', marginLeft: '8px', fontVariantNumeric: 'tabular-nums' }}>
+      00:{timeLeft.toString().padStart(2, '0')}
+    </span>
+  );
+};
+
 export default function ScoreboardSidebar({
   players,
   currentTurnUid,
@@ -23,7 +48,8 @@ export default function ScoreboardSidebar({
           return (
             <div
               key={p.uid}
-              className={`player-item ${isDrawing ? "is-drawing" : ""}`}
+              className={`player-item ${isDrawing ? "is-drawing" : ""} ${!p.connected ? "disconnected" : ""}`}
+              style={{ opacity: p.connected ? 1 : 0.6 }}
             >
               <div
                 className="color-swatch-wrapper"
@@ -36,7 +62,7 @@ export default function ScoreboardSidebar({
               >
                 <div
                   className="color-swatch"
-                  style={{ backgroundColor: p.color }}
+                  style={{ backgroundColor: p.color, filter: !p.connected ? 'grayscale(1)' : 'none' }}
                 ></div>
                 {isOwner && (
                   <div
@@ -89,6 +115,9 @@ export default function ScoreboardSidebar({
                   >
                     <path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a2 2 0 0 0-2.83 0L9 10.83l4.17 4.17 7.54-7.54a2 2 0 0 0 0-2.83z" />
                   </svg>
+                )}
+                {!p.connected && p.disconnectTime && (
+                  <DisconnectTimer disconnectTime={p.disconnectTime} />
                 )}
               </div>
             </div>

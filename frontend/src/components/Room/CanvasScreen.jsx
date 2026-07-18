@@ -230,6 +230,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
                   max="20"
                   value={strokeWidth}
                   onChange={(e) => setStrokeWidth(Number(e.target.value))}
+                  style={{ '--thickness': `${strokeWidth}px` }}
                 />
               </div>
               <div className="tool-group colors">

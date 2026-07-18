@@ -49,6 +49,8 @@ export default function RoomScreen() {
   const [needsName, setNeedsName] = useState(false);
   const [tempName, setTempName] = useState('');
 
+  const [isSpectator, setIsSpectator] = useState(false);
+
   useEffect(() => {
     if (!socket || !code) return;
 
@@ -72,6 +74,9 @@ export default function RoomScreen() {
         } else {
           setRoomState(response.state);
           setDisplayedState(response.state.state);
+          if (response.isSpectator) {
+            setIsSpectator(true);
+          }
         }
       }
     );
@@ -228,6 +233,11 @@ export default function RoomScreen() {
 
   return (
     <div className="room-screen">
+      {isSpectator && (
+        <div className="spectator-banner" style={{ background: 'var(--ink-blue)', color: 'var(--bone)', padding: '8px 16px', textAlign: 'center', fontFamily: 'var(--font-ui)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100 }}>
+          Spectator Mode - You will join the next game
+        </div>
+      )}
       <div className={`screen-transition-wrapper ${fadeClass}`}>
         {renderScreen()}
       </div>

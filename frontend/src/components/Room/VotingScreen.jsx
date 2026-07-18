@@ -62,7 +62,7 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
           <div
             key={p.uid}
             className={`suspect-card-sketch shape-sketch-box ${selectedUid === p.uid ? "selected" : ""} ${myVote && myVote !== p.uid ? "eliminated-hide" : ""}`}
-            onClick={() => !myVote && setSelectedUid(p.uid)}
+            onClick={() => myPlayer && !myVote && setSelectedUid(p.uid)}
           >
             <div className="seal-wrapper">
               <div
@@ -89,7 +89,9 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
           alignItems: "center",
         }}
       >
-        {myVote ? (
+        {!myPlayer ? (
+          <p className="waiting-msg">Spectating... waiting for players to vote</p>
+        ) : myVote ? (
           <p className="waiting-msg">Vote cast! Waiting for others...</p>
         ) : (
           <Button onClick={handleVoteSubmit} disabled={!selectedUid}>

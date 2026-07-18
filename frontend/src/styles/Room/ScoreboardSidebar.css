@@ -1,11 +1,22 @@
 .scoreboard-sidebar {
   width: 100%;
   max-width: 600px;
+  position: relative;
+  background: transparent;
+  padding: 16px;
+  margin-top: 16px;
+  z-index: 1;
+}
+
+.scoreboard-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--studio-wall);
   border: 1px solid var(--bone-muted);
   border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
+  z-index: -1;
+  filter: url(#sketch-filter-1);
 }
 
 .scoreboard-sidebar h3 {
@@ -29,14 +40,26 @@
   display: flex;
   align-items: center;
   padding: 8px;
-  background: var(--studio-wall-alt);
-  border-radius: 6px;
-  transition: background 0.2s;
+  position: relative;
+  background: transparent;
+  border-radius: 0;
+  z-index: 1;
 }
 
-.player-item.is-drawing {
+.player-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--studio-wall-alt);
+  border-radius: 0;
+  z-index: -1;
+  transition: background 0.2s, border 0.2s;
+  filter: url(#sketch-filter-2);
+}
+
+.player-item.is-drawing::before {
   background: var(--graphite);
-  border-left: 3px solid var(--brass);
+  box-shadow: inset 4px 0 0 var(--brass);
 }
 
 .player-item .color-swatch {

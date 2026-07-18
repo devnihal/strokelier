@@ -71,6 +71,18 @@ module.exports = function registerVoteHandlers(io, socket, activeRooms) {
       p.isImposter = false;
     }
 
+    // Promote spectators to players
+    const { assignColor } = require('./roomHandlers');
+    const Player = require('../game/Player');
+    for (const [sUid, spec] of room.spectators.entries()) {
+      if (room.players.size < room.settings.maxPlayers) {
+        const newPlayer = new Player(spec.uid, spec.socketId, spec.name, false);
+        newPlayer.color = assignColor(room);
+        room.addPlayer(newPlayer);
+      }
+    }
+    room.spectators.clear();
+
     io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
   });
 };

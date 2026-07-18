@@ -18,6 +18,7 @@ class Player {
     this.isImposter = false;
     this.score = 0;
     this.connected = true;
+    this.disconnectTime = null;
     this.joinedAt = Date.now();
   }
 
@@ -34,6 +35,7 @@ class Player {
       isRoomOwner: this.isRoomOwner,
       score: this.score,
       connected: this.connected,
+      disconnectTime: this.disconnectTime,
       joinedAt: this.joinedAt,
     };
   }

@@ -14,6 +14,7 @@ class Room {
     this.code = generateRoomCode(activeRooms);
     this.ownerUid = ownerUid;
     this.players = new Map(); // uid -> Player
+    this.spectators = new Map(); // uid -> { uid, socketId, name }
     this.settings = {
       maxPlayers: 8,
       roundsPerGame: 3,
@@ -41,11 +42,17 @@ class Room {
     for (const [uid, player] of this.players.entries()) {
       publicPlayers[uid] = player.toPublicState();
     }
+    
+    const publicSpectators = {};
+    for (const [uid, spec] of this.spectators.entries()) {
+      publicSpectators[uid] = { uid: spec.uid, name: spec.name };
+    }
 
     return {
       code: this.code,
       ownerUid: this.ownerUid,
       players: publicPlayers,
+      spectators: publicSpectators,
       settings: this.settings,
       state: this.state,
       // Imposter and word are hidden from the public state UNLESS the game is over
