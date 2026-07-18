@@ -1,0 +1,20 @@
+.input-field {
+  font-family: var(--font-ui);
+  font-size: 16px; /* iOS auto-zoom prevention */
+  background: var(--studio-wall-alt);
+  border: 1px solid var(--bone-muted);
+  color: var(--bone);
+  padding: 12px 16px;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--duration-micro) var(--ease-micro);
+}
+
+.input-field::placeholder {
+  color: var(--bone-muted);
+  opacity: 0.6;
+}
+
+.input-field:focus {
+  border-color: var(--brass);
+}

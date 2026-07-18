@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { PlayerSessionProvider } from './context/PlayerSessionContext';
 import { SocketProvider } from './context/SocketContext';
 import Button from './components/common/Button';
-import Logo from './components/common/Logo';
-import StrokeDivider from './components/common/StrokeDivider';
+import WelcomeScreen from './components/Welcome/WelcomeScreen';
 
 function App() {
   return (
@@ -12,13 +11,12 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={
+              <WelcomeScreen />
+            } />
+            <Route path="/room/:code" element={
               <div style={{ padding: 48, textAlign: 'center' }}>
-                <Logo />
-                <StrokeDivider />
-                <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 32 }}>
-                  <Button>Open Atelier</Button>
-                  <Button variant="danger">Danger Action</Button>
-                </div>
+                <h2>Game Room Placeholder</h2>
+                <p>You joined a room!</p>
               </div>
             } />
           </Routes>
