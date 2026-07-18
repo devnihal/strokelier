@@ -1,82 +1,90 @@
-.turn-roster-stream {
+.scoreboard-sidebar {
+  width: 100%;
+  max-width: 600px;
+  background: var(--studio-wall);
+  border: 1px solid var(--bone-muted);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.scoreboard-sidebar h3 {
+  font-family: var(--font-ui);
+  color: var(--bone-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--graphite);
+  padding-bottom: 8px;
+}
+
+.player-list {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  position: relative;
-  background: transparent;
-}
-.turn-roster-stream::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--hairline);
-  background: var(--studio-wall);
-  z-index: -1;
-  filter: url(#sketch-filter-3);
-}
-.turn-roster-node {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  position: relative;
-  transition: background 240ms var(--ease-micro);
-}
-.turn-roster-node::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--hairline);
-  filter: url(#sketch-filter-5);
-}
-.turn-roster-node:last-child::after { display: none; }
-
-.turn-roster-node .node-indicator {
-  font-family: var(--font-hand);
-  font-size: 14px;
-  color: var(--bone-muted);
-  min-width: 60px;
-}
-.turn-roster-node .node-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-family: var(--font-hand);
-  font-size: 16px;
-  color: var(--bone-muted);
-  transition: color 240ms var(--ease-micro);
+  gap: 8px;
 }
 
-.turn-roster-node.active {
+.player-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
   background: var(--studio-wall-alt);
+  border-radius: 6px;
+  transition: background 0.2s;
 }
-.turn-roster-node.active .node-profile {
+
+.player-item.is-drawing {
+  background: var(--graphite);
+  border-left: 3px solid var(--brass);
+}
+
+.player-item .color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.player-name {
+  font-family: var(--font-ui);
   color: var(--bone);
+  font-size: 14px;
 }
-.turn-roster-node.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--brass);
-  filter: url(#sketch-filter-1);
+
+.player-score {
+  font-family: var(--font-code);
+  color: var(--bone-muted);
+  font-size: 12px;
 }
-.turn-roster-node .active-chevron {
-  position: absolute;
-  right: 20px;
-  font-family: var(--font-hand);
-  font-size: 13px;
+
+.badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  font-family: var(--font-code);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 2px 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.badge.owner {
   color: var(--brass);
-  opacity: 0;
-  transform: translateX(-6px);
-  transition: all 240ms var(--ease-arrive);
+  border: 1px solid var(--brass);
 }
-.turn-roster-node.active .active-chevron {
-  opacity: 1;
-  transform: translateX(0);
+
+.badge.drawing {
+  color: var(--wax-red);
+  border: 1px solid var(--wax-red);
 }

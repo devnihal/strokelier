@@ -1,5 +1,5 @@
 const Player = require('../game/Player');
-const { PLAYER_COLORS } = require('../config/constants');
+const { VALID_COLORS } = require('../config/constants');
 
 module.exports = function registerRoomHandlers(io, socket, activeRooms) {
   
@@ -10,10 +10,10 @@ module.exports = function registerRoomHandlers(io, socket, activeRooms) {
     const usedColors = new Set(
       Array.from(room.players.values()).map(p => p.color)
     );
-    for (const color of PLAYER_COLORS) {
+    for (const color of VALID_COLORS) {
       if (!usedColors.has(color)) return color;
     }
-    return PLAYER_COLORS[0]; // Fallback if all 12 somehow taken
+    return VALID_COLORS[0]; // Fallback if all 12 somehow taken
   };
 
   /**

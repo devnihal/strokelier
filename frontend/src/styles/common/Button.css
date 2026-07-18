@@ -1,17 +1,65 @@
-/* Button styles are mostly handled by .plaque in index.css */
+.btn {
+  font-family: var(--font-ui); 
+  font-size: 14px; 
+  background: transparent; 
+  border: none;
+  color: var(--brass); 
+  padding: 10px 20px; 
+  cursor: pointer; 
+  transition: all 140ms var(--ease-micro); 
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.plaque-danger {
-  color: var(--bone);
-}
-.plaque-danger::before {
-  background: var(--wax-red);
-  border-color: var(--wax-red);
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--brass);
+  z-index: -1;
   filter: url(#sketch-filter-1);
+  transition: background 140ms var(--ease-micro), filter 140ms var(--ease-micro);
 }
-.plaque-danger:hover {
-  color: var(--bone);
+
+.btn:hover::before { 
+  background: rgba(229,184,92,0.1); 
+  filter: url(#sketch-filter-3);
 }
-.plaque-danger:hover::before {
-  background: var(--wax-red-hover);
-  border-color: var(--wax-red-hover);
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary variant */
+.btn.variant-primary {
+  color: var(--graphite);
+}
+.btn.variant-primary::before {
+  background: var(--brass);
+}
+.btn.variant-primary:hover::before {
+  background: var(--brass-hover);
+}
+
+/* Danger variant */
+.btn.variant-danger {
+  color: var(--wax-red);
+}
+.btn.variant-danger::before {
+  border-color: var(--wax-red);
+}
+.btn.variant-danger:hover::before {
+  background: rgba(217, 65, 50, 0.1);
 }

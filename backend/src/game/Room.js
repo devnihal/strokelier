@@ -48,7 +48,9 @@ class Room {
       players: publicPlayers,
       settings: this.settings,
       state: this.state,
-      // Imposter and word are hidden from the public state
+      // Imposter and word are hidden from the public state UNLESS the game is over
+      imposterUid: this.state === 'RESULTS' ? this.imposterUid : undefined,
+      currentWord: this.state === 'RESULTS' ? this.currentWord : undefined,
       drawOrder: this.drawOrder,
       currentTurnIndex: this.currentTurnIndex,
       currentRoundNumber: this.currentRoundNumber,

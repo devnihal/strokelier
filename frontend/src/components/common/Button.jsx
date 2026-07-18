@@ -13,16 +13,21 @@ import '../../styles/common/Button.css';
  * @param {function} [props.onClick]
  * @param {string} [props.className]
  */
-export default function Button({ children, onClick, variant = 'primary', className = '', disabled = false, style }) {
-  // Use the mockup's .plaque class structure
-  const baseClass = variant === 'danger' ? 'plaque plaque-danger' : 'plaque';
+export default function Button({ 
+  variant = 'primary', 
+  children, 
+  onClick, 
+  className = '', 
+  ...rest 
+}) {
+  const baseClass = 'btn';
+  const variantClass = variant === 'danger' ? 'variant-danger' : '';
   
   return (
     <button 
-      className={`${baseClass} ${className}`} 
+      className={`${baseClass} ${variantClass} ${className}`.trim()} 
       onClick={onClick}
-      disabled={disabled}
-      style={style}
+      {...rest}
     >
       {children}
     </button>

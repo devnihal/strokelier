@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Fraunces:ital,wght@0,500;0,600;1,500&family=Space+Grotesk:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 :root {
   --graphite: #050403; 
   --studio-wall: #0e0a08;
@@ -11,9 +13,10 @@
   --bone: #fff6e5; 
   --bone-muted: #7c6f59;
   --hairline: rgba(255, 246, 229, 0.15);
+  
   --ease-arrive: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-micro: cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* Typography Tokens */
   --font-heading: 'Fraunces', serif;
   --font-ui: 'Space Grotesk', sans-serif;
@@ -27,141 +30,20 @@
 
 body {
   margin: 0;
-  background: var(--graphite);
+  background-color: var(--graphite);
   color: var(--bone);
   font-family: var(--font-ui);
-  padding: 16px;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+button, input {
+  font-family: inherit;
+}
+
 #root {
   width: 100%;
-  max-width: 600px;
-}
-
-/* Base Utility Classes */
-h1, h2, h3, h4, p {
-  margin: 0;
-}
-
-.label { 
-  font-family: var(--font-code); 
-  font-size: 11px; 
-  letter-spacing: 0.12em; 
-  text-transform: uppercase; 
-  color: var(--bone-muted); 
-  margin: 0 0 20px; 
-  display: flex; 
-  align-items: center; 
-  gap: 12px; 
-}
-
-/* Common Shape Overlays */
-.shape-prime {
-  padding: 32px 16px;
-  position: relative;
-  background: transparent;
-  width: 100%;
-}
-.shape-prime::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--studio-wall);
-  border: 2px solid var(--hairline);
-  z-index: -1;
-  filter: url(#sketch-filter-1);
-}
-.shape-prime h1 { 
-  font-family: var(--font-heading); 
-  font-weight: 600; 
-  font-size: 42px; 
-  margin: 0; 
-  letter-spacing: -0.02em; 
-  color: var(--brass); 
-  text-align: center;
-}
-
-.shape-sketch-box {
-  position: relative;
-  background: transparent;
-  transition: background 240ms var(--ease-micro);
-}
-.shape-sketch-box::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--studio-wall-alt);
-  border: 1px solid var(--hairline);
-  z-index: -1;
-  transition: border-color 240ms var(--ease-micro), background 240ms var(--ease-micro);
-}
-
-/* Base Button (replaces .btn) */
-.plaque { 
-  font-family: var(--font-ui); 
-  font-weight: 500; 
-  font-size: 14px; 
-  background: transparent; 
-  border: none;
-  color: var(--brass); 
-  padding: 14px 28px; 
-  cursor: pointer; 
-  transition: all 140ms var(--ease-micro); 
-  text-transform: uppercase; 
-  letter-spacing: 0.05em; 
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-.plaque::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--studio-wall-alt);
-  border: 1px solid var(--brass);
-  z-index: -1;
-  filter: url(#sketch-filter-4);
-  transition: background 140ms var(--ease-micro);
-}
-.plaque:hover { color: var(--graphite); }
-.plaque:hover::before { background: var(--brass); }
-.plaque:active { transform: scale(0.97); }
-.plaque:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Input Fields */
-.name-input { 
-  display: block; 
-  width: 100%; 
-  background: var(--studio-wall-alt); 
-  border: 1px solid var(--hairline); 
-  color: var(--bone); 
-  font-family: var(--font-hand); 
-  font-size: 16px; 
-  padding: 12px 14px; 
-  text-align: center; 
-  filter: url(#sketch-filter-2);
-}
-.name-input:focus { 
-  outline: none; 
-  border-color: var(--brass); 
-  background: var(--graphite); 
-}
-
-/* Seal & Doodles */
-.seal {
-  display: block;
-}
-.doodle-illustration {
-  position: absolute;
-  pointer-events: none;
-  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }

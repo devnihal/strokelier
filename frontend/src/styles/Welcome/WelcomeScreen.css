@@ -1,1 +1,80 @@
-/* Styles now mostly inherited from index.css mockup base classes */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.welcome-screen h1 {
+  font-family: var(--font-heading);
+  font-size: 64px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: var(--brass);
+}
+
+.welcome-screen .tagline {
+  font-family: var(--font-hand);
+  font-size: 18px;
+  color: var(--bone-muted);
+  margin-top: 16px;
+  margin-bottom: 48px;
+}
+
+.action-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.input-group label {
+  font-family: var(--font-code);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-muted);
+}
+
+.input-group input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--bone-muted);
+  color: var(--bone);
+  font-family: var(--font-hand);
+  font-size: 24px;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-bottom-color: var(--brass);
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.action-buttons button {
+  width: 100%;
+}
