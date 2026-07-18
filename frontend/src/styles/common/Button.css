@@ -1,0 +1,58 @@
+.btn {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  color: var(--brass);
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: all var(--duration-micro) var(--ease-micro);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--studio-wall-alt);
+  border: 1px solid var(--brass);
+  z-index: -1;
+  filter: url(#sketch-filter-4);
+  transition: background var(--duration-micro) var(--ease-micro), border-color var(--duration-micro) var(--ease-micro);
+}
+
+.btn:hover {
+  color: var(--graphite);
+}
+
+.btn:hover::before {
+  background: var(--brass);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Danger variant */
+.btn.variant-danger {
+  color: var(--bone);
+}
+.btn.variant-danger::before {
+  background: var(--wax-red);
+  border-color: var(--wax-red);
+}
+.btn.variant-danger:hover {
+  color: var(--bone);
+}
+.btn.variant-danger:hover::before {
+  background: var(--wax-red-hover);
+  border-color: var(--wax-red-hover);
+}

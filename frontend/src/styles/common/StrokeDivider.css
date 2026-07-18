@@ -1,0 +1,33 @@
+.stroke-divider {
+  display: block;
+  margin: -5px auto 0;
+  max-width: 100%;
+}
+
+.stroke-divider-path {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  
+  /* Setup for draw-in animation */
+  stroke-dasharray: 250; /* approximate path length */
+  stroke-dashoffset: 250;
+}
+
+.stroke-divider.animate-in .stroke-divider-path {
+  animation: drawStroke 600ms ease-out forwards;
+}
+
+@keyframes drawStroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stroke-divider-path,
+  .stroke-divider.animate-in .stroke-divider-path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}
