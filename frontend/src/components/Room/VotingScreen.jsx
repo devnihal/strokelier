@@ -26,47 +26,65 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
   };
 
   return (
-    <div className="voting-screen">
-      <div className="voting-header">
-        <h1>Who is the Imposter?</h1>
-        <StrokeDivider />
-        <p>Review the canvas and cast your vote.</p>
-      </div>
-
-      <div className="voting-canvas-preview">
-        {/* We can re-render the canvas here for review, or just tell them to vote for now. */}
-        <p className="preview-placeholder">Canvas Review</p>
-      </div>
-
-      <div className="suspect-grid">
-        {players.map(p => (
-          <div 
-            key={p.uid} 
-            className={`suspect-card ${selectedUid === p.uid ? 'selected' : ''}`}
-            style={{ borderColor: selectedUid === p.uid ? p.color : 'var(--bone-muted)' }}
-            onClick={() => !myVote && setSelectedUid(p.uid)}
-          >
-            <div className="color-swatch" style={{ backgroundColor: p.color }}></div>
-            <span className="player-name">{p.name}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="voting-actions">
-        {myVote ? (
-          <p className="waiting-msg">Vote cast! Waiting for others...</p>
-        ) : (
-          <Button onClick={handleVoteSubmit} disabled={!selectedUid}>
-            Submit Vote
-          </Button>
-        )}
+    <div className="wrap">
+      <section>
+        <h2 className="label">Accusation — Identify the Master Forger</h2>
         
-        {roomState.ownerUid === myPlayer?.uid && (
-          <Button onClick={handleForceReveal} variant="danger" style={{ marginTop: 16 }}>
-            Force Reveal
-          </Button>
-        )}
-      </div>
+        <div style={{ position: 'relative', paddingTop: '10px' }}>
+          <div className="suspect-row" id="suspectRow">
+            {players.map((p, index) => {
+              const rotation = (index % 2 === 0 ? 1 : -1) * (2 + (index % 7));
+              const radii = [
+                '42% 58% 55% 45% / 45% 42% 58% 55%',
+                '58% 42% 38% 62% / 62% 55% 45% 38%',
+                '35% 65% 60% 40% / 55% 35% 65% 45%',
+                '65% 35% 45% 55% / 40% 60% 40% 60%'
+              ];
+              const radius = radii[index % radii.length];
+              const isSelected = selectedUid === p.uid;
+
+              return (
+                <div 
+                  key={p.uid}
+                  className={`suspect-card-sketch shape-sketch-box ${isSelected ? 'selected' : ''}`}
+                  onClick={() => !myVote && setSelectedUid(p.uid)}
+                >
+                  <div className="seal-wrapper">
+                    <div 
+                      className="seal" 
+                      style={{ 
+                        background: p.color || 'var(--bone-muted)', 
+                        width: '32px', height: '32px', 
+                        borderRadius: radius,
+                        transform: `rotate(${rotation}deg)`
+                      }} 
+                    />
+                  </div>
+                  <div className="suspect-name">{p.name}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          {myVote ? (
+            <p style={{ fontFamily: 'var(--font-hand)', color: 'var(--bone-muted)' }}>Vote cast! Waiting for others...</p>
+          ) : (
+            <button className="confirm-vote" onClick={handleVoteSubmit} disabled={!selectedUid}>
+              Cast Accusation Plaque
+            </button>
+          )}
+
+          {roomState.ownerUid === myPlayer?.uid && (
+            <div style={{ marginTop: '24px' }}>
+              <Button onClick={handleForceReveal} variant="danger">
+                Force Reveal (Host)
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

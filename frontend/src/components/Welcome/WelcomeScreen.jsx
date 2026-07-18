@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlayerSession } from '../../context/PlayerSessionContext';
-import Logo from '../common/Logo';
-import StrokeDivider from '../common/StrokeDivider';
 import Button from '../common/Button';
-import Input from '../common/Input';
 import '../../styles/Welcome/WelcomeScreen.css';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
@@ -85,49 +82,48 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <div className="welcome-screen">
-      <h2 className="welcome-label">Welcome Atelier</h2>
-      <Logo />
-      <StrokeDivider />
+    <div className="wrap">
+      <section className="welcome shape-prime">
+        {/* Contextual Motif: Sketched Pen Nib & Splatter */}
+        <svg className="doodle-illustration" style={{ top: '15px', left: '20px', width: '40px', height: '40px' }} viewBox="0 0 24 24" fill="none" stroke="var(--brass)" strokeWidth="1.2" strokeLinecap="round">
+          <path d="M12 2L9 9v3h6V9l-3-7zM12 2v10M10 17c1 0 0 2 2 2s1-2 2-2" />
+          <circle cx="6" cy="7" r="1" fill="var(--brass)"/>
+          <circle cx="5" cy="12" r="0.7" fill="var(--brass)"/>
+        </svg>
 
-      <div className="welcome-form">
-        <div className="form-group">
-          <label htmlFor="playerName">Your Name</label>
-          <Input 
-            id="playerName"
-            type="text" 
-            placeholder="e.g. Master Painter" 
-            value={name}
-            onChange={handleNameChange}
-            maxLength={20}
+        <h2 className="label" style={{ justifyContent: 'center' }}>Welcome Atelier</h2>
+        <h1 style={{ textAlign: 'center' }}>strokelier</h1>
+        <svg className="stroke-underline" width="220" height="20" viewBox="0 0 220 20" style={{ display: 'block', margin: '8px auto 0' }}>
+          <path d="M4 12 C 45 4, 75 16, 115 7 S 175 3, 216 13" fill="none" stroke="var(--brass)" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
+
+        <input 
+          className="name-input" 
+          placeholder="ENTER ARTIST ALIAS" 
+          value={name}
+          onChange={handleNameChange}
+          style={{ marginTop: '48px', marginBottom: '24px' }}
+          disabled={isSubmitting}
+        />
+        
+        {error && <div style={{ color: 'var(--wax-red)', textAlign: 'center', marginBottom: '16px', fontFamily: 'var(--font-ui)' }}>{error}</div>}
+
+        <div className="plaque-row">
+          <Button onClick={handleCreateGame} disabled={isSubmitting}>Open Atelier</Button>
+        </div>
+
+        <div className="join-row" style={{ marginTop: '24px', display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <input 
+            className="name-input code-input"
+            placeholder="INVITE CODE" 
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            style={{ margin: 0, width: '160px' }}
             disabled={isSubmitting}
           />
+          <Button onClick={handleJoinGame} disabled={isSubmitting} style={{ width: 'auto' }}>Join Drawing</Button>
         </div>
-
-        {error && <div className="error-msg">{error}</div>}
-
-        <div className="actions">
-          <Button onClick={handleCreateGame} disabled={isSubmitting}>
-            Create Game
-          </Button>
-
-          <StrokeDivider color="var(--ink-blue)" variant="flat" />
-
-          <div className="join-group">
-            <Input 
-              type="text" 
-              placeholder="000000" 
-              value={roomCode}
-              onChange={(e) => setRoomCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              maxLength={6}
-              disabled={isSubmitting}
-            />
-            <Button onClick={handleJoinGame} disabled={isSubmitting}>
-              Join Game
-            </Button>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

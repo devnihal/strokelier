@@ -155,64 +155,93 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
   };
 
   return (
-    <div className="canvas-screen">
-      <div className="game-header">
-        {isMyTurn ? (
-          <div className="turn-indicator is-me">
-            <p>Your turn to draw</p>
-            {roleInfo.role === 'imposter' ? (
-              <h2 className="secret-word imposter">You are the Imposter! Blend in.</h2>
-            ) : (
-              <h2 className="secret-word">Word: {roleInfo.word}</h2>
-            )}
-          </div>
-        ) : (
-          <div className="turn-indicator">
-            <p>Waiting for artist</p>
-            <h2>{currentPlayer?.name} is drawing...</h2>
-          </div>
-        )}
-      </div>
+    <div className="wrap">
+      <section style={{ marginBottom: '24px' }}>
+        <h2 className="label">Studio Easel</h2>
+        <div className="canvas-header" style={{ marginBottom: '16px', textAlign: 'center' }}>
+          {isMyTurn ? (
+            <div>
+              <span className="code-display-value" style={{ fontSize: '14px', marginBottom: '4px' }}>Your turn to draw</span>
+              {roleInfo.role === 'imposter' ? (
+                <h4 style={{ color: 'var(--wax-red)', fontFamily: 'var(--font-heading)' }}>You are the Imposter! Blend in.</h4>
+              ) : (
+                <h4 style={{ color: 'var(--bone)', fontFamily: 'var(--font-heading)' }}>Word: <span style={{ color: 'var(--ink-blue)' }}>{roleInfo.word}</span></h4>
+              )}
+            </div>
+          ) : (
+            <div>
+              <span className="code-display-value" style={{ fontSize: '14px', marginBottom: '4px' }}>Waiting for artist</span>
+              <h4 style={{ color: 'var(--bone)', fontFamily: 'var(--font-heading)' }}>{currentPlayer?.name} is drawing...</h4>
+            </div>
+          )}
+        </div>
 
-      <div className="canvas-container">
-        <canvas 
-          ref={canvasRef}
-          className={`drawing-board ${isMyTurn && !hasPendingStroke ? 'can-draw' : ''}`}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
-      </div>
+        <div className="shape-sketch-box canvas-container" style={{ width: '100%', height: '400px', cursor: (isMyTurn && !hasPendingStroke) ? 'crosshair' : 'default' }}>
+          <canvas 
+            ref={canvasRef}
+            className="drawing-board"
+            style={{ width: '100%', height: '100%', display: 'block' }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+          />
+        </div>
+      </section>
 
       {isMyTurn && !hasPendingStroke && (
-        <div className="drawing-tools">
-          <div className="tool-group">
-            <label>Thickness</label>
-            <input 
-              type="range" 
-              min="1" 
-              max="20" 
-              value={strokeWidth} 
-              onChange={(e) => setStrokeWidth(Number(e.target.value))} 
-            />
+        <section style={{ marginBottom: '24px' }}>
+          <h2 className="label">Pigment Swatches — Hand-Pressed Liquid Profiles</h2>
+          
+          <div style={{ marginBottom: '24px' }}>
+             <label style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: 'var(--bone-muted)', display: 'block', marginBottom: '8px' }}>THICKNESS: {strokeWidth}px</label>
+             <input 
+               type="range" 
+               min="1" 
+               max="20" 
+               value={strokeWidth} 
+               onChange={(e) => setStrokeWidth(Number(e.target.value))} 
+               style={{ width: '100%' }}
+             />
           </div>
-          <div className="tool-group colors">
-            {COLORS.map(c => (
-              <button 
-                key={c}
-                className={`color-swatch ${strokeColor === c ? 'active' : ''}`}
-                style={{ backgroundColor: c }}
-                onClick={() => setStrokeColor(c)}
-              />
-            ))}
+
+          <div className="swatch-grid">
+            <svg className="doodle-illustration" style={{ right: '-20px', top: '10px', width: '35px', height: '35px' }} viewBox="0 0 24 24" fill="none" stroke="var(--bone-muted)" strokeWidth="1.2" strokeLinecap="round">
+              <path d="M3 5l18 14M21 5L3 19M5 12h14" />
+            </svg>
+            
+            {COLORS.map((c, i) => {
+              const rotation = (i % 2 === 0 ? 1 : -1) * (2 + (i % 7));
+              const radii = [
+                '42% 58% 55% 45% / 45% 42% 58% 55%',
+                '58% 42% 38% 62% / 62% 55% 45% 38%',
+                '35% 65% 60% 40% / 55% 35% 65% 45%',
+                '65% 35% 45% 55% / 40% 60% 40% 60%',
+                '48% 52% 65% 35% / 35% 48% 52% 65%'
+              ];
+              const radius = radii[i % radii.length];
+              const isSelected = strokeColor === c;
+              
+              return (
+                <div 
+                  key={c}
+                  className={`swatch ${isSelected ? 'selected' : ''}`}
+                  style={{ 
+                    backgroundColor: c,
+                    borderRadius: radius,
+                    transform: `rotate(${rotation}deg)`
+                  }}
+                  onClick={() => setStrokeColor(c)}
+                />
+              );
+            })}
           </div>
-        </div>
+        </section>
       )}
 
       {isMyTurn && (
-        <div className="canvas-actions">
-          <Button onClick={handleRetry} disabled={!hasPendingStroke} className="btn-retry">
+        <div className="plaque-row" style={{ marginBottom: '40px' }}>
+          <Button onClick={handleRetry} disabled={!hasPendingStroke} variant="secondary">
             Retry Stroke
           </Button>
           <Button onClick={handleNextPlayer} disabled={!hasPendingStroke}>

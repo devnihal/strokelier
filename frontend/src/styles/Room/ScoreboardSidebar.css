@@ -1,75 +1,82 @@
-.scoreboard-sidebar {
-  width: 100%;
-  max-width: 600px;
-  background: var(--studio-wall);
-  border: 1px solid var(--bone-muted);
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-}
-
-.scoreboard-sidebar h3 {
-  font-family: var(--font-ui);
-  color: var(--bone-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 12px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--graphite);
-  padding-bottom: 8px;
-}
-
-.player-list {
+.turn-roster-stream {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  width: 100%;
+  position: relative;
+  background: transparent;
 }
-
-.player-item {
+.turn-roster-stream::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--hairline);
+  background: var(--studio-wall);
+  z-index: -1;
+  filter: url(#sketch-filter-3);
+}
+.turn-roster-node {
   display: flex;
   align-items: center;
-  padding: 8px;
-  background: var(--studio-wall-alt);
-  border-radius: 6px;
-  transition: background 0.2s;
+  gap: 16px;
+  padding: 16px 20px;
+  position: relative;
+  transition: background 240ms var(--ease-micro);
 }
-
-.player-item.is-drawing {
-  background: var(--graphite);
-  border-left: 3px solid var(--brass);
+.turn-roster-node::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--hairline);
+  filter: url(#sketch-filter-5);
 }
+.turn-roster-node:last-child::after { display: none; }
 
-.player-item .color-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  margin-right: 12px;
-  flex-shrink: 0;
-}
-
-.player-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.player-name {
-  font-family: var(--font-ui);
-  color: var(--bone);
+.turn-roster-node .node-indicator {
+  font-family: var(--font-hand);
   font-size: 14px;
-}
-
-.player-score {
-  font-family: var(--font-code);
   color: var(--bone-muted);
-  font-size: 12px;
+  min-width: 60px;
 }
-
-.badges {
+.turn-roster-node .node-profile {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-hand);
+  font-size: 16px;
+  color: var(--bone-muted);
+  transition: color 240ms var(--ease-micro);
 }
 
-.badge {
-  font-size: 16px;
+.turn-roster-node.active {
+  background: var(--studio-wall-alt);
+}
+.turn-roster-node.active .node-profile {
+  color: var(--bone);
+}
+.turn-roster-node.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--brass);
+  filter: url(#sketch-filter-1);
+}
+.turn-roster-node .active-chevron {
+  position: absolute;
+  right: 20px;
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: var(--brass);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: all 240ms var(--ease-arrive);
+}
+.turn-roster-node.active .active-chevron {
+  opacity: 1;
+  transform: translateX(0);
 }

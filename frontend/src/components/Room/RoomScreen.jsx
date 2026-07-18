@@ -4,6 +4,8 @@ import { useSocket } from '../../hooks/useSocket';
 import { usePlayerSession } from '../../context/PlayerSessionContext';
 import LobbyScreen from './LobbyScreen';
 import CanvasScreen from './CanvasScreen';
+import VotingScreen from './VotingScreen';
+import ResultsScreen from './ResultsScreen';
 import '../../styles/Room/RoomScreen.css';
 
 /**
@@ -64,22 +66,24 @@ export default function RoomScreen() {
   const isOwner = roomState.ownerUid === uid;
   const myPlayer = roomState.players[uid];
 
+  const renderScreen = () => {
+    switch (roomState.state) {
+      case 'LOBBY':
+        return <LobbyScreen roomState={roomState} isOwner={isOwner} myPlayer={myPlayer} socket={socket} />;
+      case 'DRAWING':
+        return <CanvasScreen roomState={roomState} myPlayer={myPlayer} socket={socket} />;
+      case 'VOTING':
+        return <VotingScreen roomState={roomState} myPlayer={myPlayer} socket={socket} />;
+      case 'RESULTS':
+        return <ResultsScreen roomState={roomState} myPlayer={myPlayer} socket={socket} />;
+      default:
+        return <div>Unknown game state.</div>;
+    }
+  };
+
   return (
     <div className="room-screen">
-      {roomState.state === 'LOBBY' ? (
-        <LobbyScreen 
-          roomState={roomState} 
-          isOwner={isOwner} 
-          myPlayer={myPlayer} 
-          socket={socket} 
-        />
-      ) : (
-        <CanvasScreen 
-          roomState={roomState} 
-          myPlayer={myPlayer} 
-          socket={socket} 
-        />
-      )}
+      {renderScreen()}
     </div>
   );
 }

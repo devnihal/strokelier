@@ -1,0 +1,75 @@
+.suspect-row { 
+  display: flex; 
+  justify-content: center; 
+  gap: 14px; 
+  margin-bottom: 24px; 
+  position: relative; 
+  flex-wrap: wrap;
+}
+
+.suspect-card-sketch { 
+  padding: 24px 16px; 
+  width: 140px; 
+  text-align: center; 
+  cursor: pointer; 
+  overflow: visible; 
+  transition: transform 300ms var(--ease-micro), opacity 300ms var(--ease-micro);
+}
+.suspect-card-sketch:nth-child(1)::before { filter: url(#sketch-filter-2); }
+.suspect-card-sketch:nth-child(2)::before { filter: url(#sketch-filter-4); }
+.suspect-card-sketch:nth-child(3)::before { filter: url(#sketch-filter-5); }
+.suspect-card-sketch:nth-child(4)::before { filter: url(#sketch-filter-1); }
+
+.suspect-card-sketch .suspect-name { 
+  font-family: var(--font-hand);
+  font-size: 16px; 
+  color: var(--bone);
+  transition: color 240ms var(--ease-micro); 
+  margin-top: 8px; 
+}
+
+.seal-wrapper {
+  position: relative;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.suspect-card-sketch.selected::before {
+  border-color: var(--wax-red);
+  background: rgba(217, 65, 50, 0.06);
+}
+.suspect-card-sketch.selected .suspect-name { color: var(--wax-red); }
+.suspect-card-sketch.selected .seal { transform: scale(1.05); }
+
+.confirm-vote { 
+  background: transparent; 
+  border: none; 
+  color: var(--bone); 
+  font-family: var(--font-ui); 
+  font-weight: 600; 
+  font-size: 13px; 
+  padding: 14px 28px; 
+  cursor: pointer; 
+  transition: transform 140ms var(--ease-micro); 
+  letter-spacing: 0.08em; 
+  text-transform: uppercase; 
+  position: relative;
+  z-index: 1;
+}
+.confirm-vote::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--wax-red);
+  border: 1px solid var(--wax-red);
+  z-index: -1;
+  filter: url(#sketch-filter-1);
+  transition: background 140ms var(--ease-micro), border-color 140ms var(--ease-micro);
+}
+.confirm-vote:hover::before { background: var(--wax-red-hover); border-color: var(--wax-red-hover); }
+.confirm-vote:active { transform: scale(0.98); }
+.confirm-vote:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
