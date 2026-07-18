@@ -3,6 +3,7 @@ import { PlayerSessionProvider } from './context/PlayerSessionContext';
 import { SocketProvider } from './context/SocketContext';
 import Button from './components/common/Button';
 import WelcomeScreen from './components/Welcome/WelcomeScreen';
+import RoomScreen from './components/Room/RoomScreen';
 
 function App() {
   return (
@@ -13,12 +14,7 @@ function App() {
             <Route path="/" element={
               <WelcomeScreen />
             } />
-            <Route path="/room/:code" element={
-              <div style={{ padding: 48, textAlign: 'center' }}>
-                <h2>Game Room Placeholder</h2>
-                <p>You joined a room!</p>
-              </div>
-            } />
+            <Route path="/room/:code" element={<RoomScreen />} />
           </Routes>
         </BrowserRouter>
       </SocketProvider>
