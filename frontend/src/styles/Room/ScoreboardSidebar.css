@@ -1,0 +1,75 @@
+.scoreboard-sidebar {
+  width: 100%;
+  max-width: 600px;
+  background: var(--studio-wall);
+  border: 1px solid var(--bone-muted);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.scoreboard-sidebar h3 {
+  font-family: var(--font-ui);
+  color: var(--bone-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--graphite);
+  padding-bottom: 8px;
+}
+
+.player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: var(--studio-wall-alt);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.player-item.is-drawing {
+  background: var(--graphite);
+  border-left: 3px solid var(--brass);
+}
+
+.player-item .color-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.player-name {
+  font-family: var(--font-ui);
+  color: var(--bone);
+  font-size: 14px;
+}
+
+.player-score {
+  font-family: var(--font-code);
+  color: var(--bone-muted);
+  font-size: 12px;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 16px;
+}

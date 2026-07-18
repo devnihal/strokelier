@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Button from '../common/Button';
 import StrokeDivider from '../common/StrokeDivider';
-
+import ScoreboardSidebar from './ScoreboardSidebar';
 import '../../styles/Room/CanvasScreen.css';
 
-// Duplicate colors locally for frontend if backend import is brittle, but let's try just hardcoding the standard set or fetching. Actually, importing from backend might break vite build if it resolves out of src. Let's just define them locally to be safe.
+// Duplicate colors locally for frontend if backend import is brittle
 const COLORS = [
   '#B23A2E', '#5C7A4A', '#4C6B8A', '#7A4A6B', '#CBA045', '#6B7580', 
   '#A85C32', '#3D7A72', '#C9836B', '#8A8148', '#7385B8', '#9E5A6B'
@@ -220,6 +220,13 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
           </Button>
         </div>
       )}
+
+      <ScoreboardSidebar 
+        players={roomState.players} 
+        currentTurnUid={currentTurnUid}
+        ownerUid={roomState.ownerUid}
+        myUid={myPlayer?.uid}
+      />
     </div>
   );
 }
