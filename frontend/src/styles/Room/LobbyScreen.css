@@ -67,7 +67,7 @@
   font-family: var(--font-hand);
   font-size: 16px;
 }
-.roster-row:nth-child(even) { background: rgba(255, 246, 229, 0.02); }
+.roster-row.is-me { background: rgba(255, 246, 229, 0.04); }
 .roster-name { font-weight: 500; }
 
 .roster-leader, .ledger-row .leader { 

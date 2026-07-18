@@ -39,9 +39,17 @@
   flex-direction: column;
   align-items: center;
   padding: 20px 16px 16px;
+  min-width: 120px;
+  background: transparent;
+}
+
+.reveal-card-sketch::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--studio-wall);
   border: 1px solid var(--hairline);
-  min-width: 120px;
+  z-index: -1;
   filter: url(#sketch-filter-2);
 }
 
@@ -54,6 +62,7 @@
   height: 32px;
   border-radius: 35% 65% 60% 40% / 55% 35% 65% 45%;
   margin-bottom: 12px;
+  filter: url(#sketch-filter-2);
 }
 
 .artist-title {
@@ -61,6 +70,7 @@
   font-size: 18px;
   color: var(--bone);
   margin-bottom: 8px;
+  filter: url(#sketch-filter-2);
 }
 
 .artist-points {

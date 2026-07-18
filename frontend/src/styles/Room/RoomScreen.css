@@ -94,3 +94,165 @@
   50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
+
+/* Role Reveal Modal */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 3, 2, 0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+.modal-scrim.open { display: flex; }
+
+.shape-citadel {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 42px 24px 28px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.94);
+  background: transparent;
+}
+.shape-citadel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--studio-wall);
+  border: 2px solid var(--hairline);
+  z-index: -1;
+}
+.shape-citadel.theme-role::before { filter: url(#sketch-filter-3); border-color: var(--wax-red); }
+.shape-citadel.theme-word::before { filter: url(#sketch-filter-4); border-color: var(--ink-blue); }
+
+.shape-citadel.play { animation: arrive 340ms var(--ease-arrive) forwards; }
+
+@keyframes arrive {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Logo illustration in the popup */
+.shape-citadel .doodle-illustration {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 84px;
+  height: 84px;
+  transform: rotate(12deg);
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 10;
+  filter: url(#sketch-filter-5);
+}
+.shape-citadel.theme-role .doodle-illustration { color: var(--wax-red); }
+.shape-citadel.theme-word .doodle-illustration { color: var(--ink-blue); }
+
+.shape-citadel .popup-header-label {
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: var(--bone-muted);
+  text-transform: uppercase;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+  display: block;
+  position: relative;
+  text-align: left;
+  width: 65%;
+}
+.shape-citadel .popup-header-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--hairline);
+  filter: url(#sketch-filter-5);
+}
+
+.shape-citadel h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 28px;
+  margin: 24px 0 6px;
+  letter-spacing: -0.01em;
+  text-align: left;
+}
+
+.shape-citadel .popup-subtitle {
+  font-family: var(--font-hand);
+  font-size: 14px;
+  color: var(--bone-muted);
+  margin-bottom: 24px;
+  display: block;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.shape-citadel .popup-data-box {
+  padding: 20px 14px;
+  margin-bottom: 24px;
+  position: relative;
+  background: transparent;
+}
+.shape-citadel .popup-data-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed var(--hairline);
+  z-index: -1;
+  filter: url(#sketch-filter-1);
+}
+
+.shape-citadel .popup-data-box .main-value {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  display: block;
+}
+
+.shape-citadel .popup-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--bone);
+  padding: 10px 28px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  transition: all 140ms var(--ease-micro);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.shape-citadel .popup-action-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--bone-muted);
+  z-index: -1;
+  filter: url(#sketch-filter-2);
+  transition: background 140ms var(--ease-micro);
+}
+
+/* Role theme colors */
+.shape-citadel.theme-role h4 { color: var(--wax-red); }
+.shape-citadel.theme-role .popup-action-btn { color: var(--wax-red); }
+.shape-citadel.theme-role .popup-action-btn::before { border-color: var(--wax-red); }
+.shape-citadel.theme-role .popup-action-btn:hover::before { background: rgba(217, 65, 50, 0.08); }
+
+/* Word theme colors */
+.shape-citadel.theme-word h4 { color: var(--ink-blue); }
+.shape-citadel.theme-word .popup-action-btn { color: var(--ink-blue); }
+.shape-citadel.theme-word .popup-action-btn::before { border-color: var(--ink-blue); }
+.shape-citadel.theme-word .popup-action-btn:hover::before { background: rgba(82, 138, 179, 0.08); }

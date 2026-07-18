@@ -85,14 +85,7 @@
 .suspect-card-sketch.eliminated-hide {
   transform: scale(0);
   opacity: 0;
-  min-width: 0;
-  width: 0;
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: -8px;
-  margin-right: -8px;
   pointer-events: none;
-  overflow: hidden;
 }
 .suspect-card-sketch.selected::before {
   border-color: var(--brass);

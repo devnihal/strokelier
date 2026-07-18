@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { flushSync } from "react-dom";
 import Button from "../common/Button";
 import "../../styles/Room/VotingScreen.css";
 
@@ -9,6 +10,23 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
 
   const players = Object.values(roomState.players);
   const myVote = roomState.votes[myPlayer?.uid];
+  const [displayedVote, setDisplayedVote] = useState(myVote);
+
+  useEffect(() => {
+    if (myVote && !displayedVote) {
+      if (document.startViewTransition) {
+        document.startViewTransition(() => {
+          flushSync(() => {
+            setDisplayedVote(myVote);
+          });
+        });
+      } else {
+        setDisplayedVote(myVote);
+      }
+    } else if (!myVote && displayedVote) {
+      setDisplayedVote(null);
+    }
+  }, [myVote, displayedVote]);
 
   const handleVoteSubmit = () => {
     if (!selectedUid) return;
@@ -58,11 +76,14 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
       </div>
 
       <div className="suspect-row">
-        {players.map((p) => (
+        {players
+          .filter((p) => !displayedVote || displayedVote === p.uid)
+          .map((p) => (
           <div
             key={p.uid}
-            className={`suspect-card-sketch shape-sketch-box ${selectedUid === p.uid ? "selected" : ""} ${myVote && myVote !== p.uid ? "eliminated-hide" : ""}`}
-            onClick={() => myPlayer && !myVote && setSelectedUid(p.uid)}
+            style={{ viewTransitionName: `suspect-${p.uid}` }}
+            className={`suspect-card-sketch shape-sketch-box ${selectedUid === p.uid ? "selected" : ""}`}
+            onClick={() => myPlayer && !displayedVote && setSelectedUid(p.uid)}
           >
             <div className="seal-wrapper">
               <div
@@ -90,8 +111,10 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
         }}
       >
         {!myPlayer ? (
-          <p className="waiting-msg">Spectating... waiting for players to vote</p>
-        ) : myVote ? (
+          <p className="waiting-msg">
+            Spectating... waiting for players to vote
+          </p>
+        ) : displayedVote ? (
           <p className="waiting-msg">Vote cast! Waiting for others...</p>
         ) : (
           <Button onClick={handleVoteSubmit} disabled={!selectedUid}>
@@ -99,11 +122,11 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
           </Button>
         )}
 
-        {roomState.ownerUid === myPlayer?.uid && (
+        {/* {roomState.ownerUid === myPlayer?.uid && (
           <Button onClick={handleForceReveal} variant="danger">
             Force Reveal
           </Button>
-        )}
+        )} */}
       </div>
     </div>
   );

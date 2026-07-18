@@ -47,17 +47,22 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
     const words = ["Mona Lisa", "Eiffel Tower", "Banana", "Dragon", "Spaceship"];
     room.currentWord = words[Math.floor(Math.random() * words.length)];
 
-    // Send targeted messages to each player about their role/word
+    // Send roles to everyone in a single bulk broadcast to guarantee delivery
+    const rolesMap = {};
     for (const [pUid, p] of room.players.entries()) {
-      if (p.isImposter) {
-        io.to(p.socketId).emit('GAME_ROLE_ASSIGNED', { role: 'imposter', word: null });
-      } else {
-        io.to(p.socketId).emit('GAME_ROLE_ASSIGNED', { role: 'artist', word: room.currentWord });
-      }
+      rolesMap[pUid] = { 
+        role: p.isImposter ? 'imposter' : 'artist', 
+        word: p.isImposter ? null : room.currentWord 
+      };
     }
-
-    // Broadcast updated public state
-    io.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
+    // Inject rolesMap into the ROOM_STATE_UPDATE payload just for this GAME_START event
+    // This absolutely guarantees that if the client receives the countdown (state transition),
+    // they also receive the roles in the exact same packet.
+    const publicState = room.toPublicState();
+    publicState.rolesMap = rolesMap;
+    
+    console.log("GAME_START: Emitting ROOM_STATE_UPDATE with injected rolesMap to", roomCode);
+    io.to(roomCode).emit('ROOM_STATE_UPDATE', publicState);
   });
 
   const getActiveRoomAndValidateTurn = (socket) => {

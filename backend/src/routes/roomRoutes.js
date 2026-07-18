@@ -54,11 +54,7 @@ module.exports = function createRoomRoutes(activeRooms) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    if (room.state !== 'LOBBY') {
-      return res.status(403).json({ error: 'Room is already in progress' });
-    }
-
-    if (room.players.size >= room.settings.maxPlayers) {
+    if (room.players.size >= room.settings.maxPlayers && room.state === 'LOBBY') {
       return res.status(403).json({ error: 'Room is full' });
     }
 

@@ -20,12 +20,17 @@ const COLORS = [
   "#9E5A6B",
 ];
 
-export default function CanvasScreen({ roomState, myPlayer, socket }) {
+export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: parentRoleInfo }) {
   const canvasRef = useRef(null);
 
-  const [roleInfo, setRoleInfo] = useState({ role: "artist", word: null });
+  const [roleInfo, setRoleInfo] = useState(parentRoleInfo || { role: "artist", word: null });
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasPendingStroke, setHasPendingStroke] = useState(false);
+
+  // Sync with parent roleInfo if it arrives later
+  useEffect(() => {
+    if (parentRoleInfo) setRoleInfo(parentRoleInfo);
+  }, [parentRoleInfo]);
 
   // Drawing settings
   const [strokeWidth, setStrokeWidth] = useState(4);
@@ -46,10 +51,11 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set actual pixel dimensions to match CSS dimensions
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    // Use fixed internal resolution for consistent stroke sizes across devices
+    if (canvas.width !== 800) {
+      canvas.width = 800;
+      canvas.height = 600;
+    }
 
     const ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
@@ -60,7 +66,8 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
       if (!points || points.length === 0) return;
       ctx.beginPath();
       ctx.strokeStyle = color;
-      ctx.lineWidth = width;
+      // Scale the visual width to match the 800px grid (a standard phone width is ~400px)
+      ctx.lineWidth = width * 1.6;
       ctx.moveTo(points[0].x * canvas.width, points[0].y * canvas.height);
       for (let i = 1; i < points.length; i++) {
         ctx.lineTo(points[i].x * canvas.width, points[i].y * canvas.height);
@@ -98,11 +105,14 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
 
   // Listen for role assignment once game starts
   useEffect(() => {
-    socket.on("GAME_ROLE_ASSIGNED", (info) => {
-      setRoleInfo(info);
+    socket.on("GAME_ROLES_BULK", (rolesMap) => {
+      const myUid = myPlayer?.uid;
+      if (myUid && rolesMap[myUid]) {
+        setRoleInfo(rolesMap[myUid]);
+      }
     });
-    return () => socket.off("GAME_ROLE_ASSIGNED");
-  }, [socket]);
+    return () => socket.off("GAME_ROLES_BULK");
+  }, [socket, myPlayer?.uid]);
 
   // Listen for remote draw events
   useEffect(() => {
@@ -185,23 +195,18 @@ export default function CanvasScreen({ roomState, myPlayer, socket }) {
   return (
     <div className="canvas-screen">
       <div className="game-header">
-        {isMyTurn ? (
-          <div className="turn-indicator is-me">
-            <p>Your turn to draw</p>
-            {roleInfo.role === "imposter" ? (
-              <h2 className="secret-word imposter">
-                You are the Imposter! Blend in.
-              </h2>
-            ) : (
-              <h2 className="secret-word">Word: {roleInfo.word}</h2>
-            )}
-          </div>
+        {roleInfo.role === "imposter" ? (
+          <h2 className="secret-word imposter">Impostor</h2>
         ) : (
-          <div className="turn-indicator">
-            <p>Waiting for artist</p>
-            <h2>{currentPlayer?.name} is drawing...</h2>
-          </div>
+          <h2 className="secret-word">{roleInfo.word || "..."}</h2>
         )}
+        <div className="turn-indicator">
+          {isMyTurn ? (
+            <p>Your turn to draw</p>
+          ) : (
+            <p>{currentPlayer?.name} is drawing...</p>
+          )}
+        </div>
       </div>
 
       <div className="canvas-layout">

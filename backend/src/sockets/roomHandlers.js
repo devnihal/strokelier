@@ -42,6 +42,7 @@ function registerRoomHandlers(io, socket, activeRooms) {
           room.spectators.set(uid, { uid, socketId: socket.id, name });
           socket.data.roomCode = roomCode;
           socket.join(roomCode);
+          socket.join(uid);
           socket.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
           return callback({ success: true, state: room.toPublicState(), isSpectator: true });
         }
@@ -66,6 +67,7 @@ function registerRoomHandlers(io, socket, activeRooms) {
       // Store roomCode in socket for disconnect handling
       socket.data.roomCode = roomCode;
       socket.join(roomCode);
+      socket.join(uid);
 
       // Notify others
       socket.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
@@ -90,6 +92,23 @@ function registerRoomHandlers(io, socket, activeRooms) {
           player.color = color;
           io.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
         }
+      }
+    }
+  });
+
+  socket.on('UPDATE_SETTINGS', (settings) => {
+    const roomCode = socket.data.roomCode;
+    const uid = socket.data.uid;
+    if (roomCode && uid && settings) {
+      const room = activeRooms.get(roomCode);
+      if (room && room.ownerUid === uid && room.state === 'LOBBY') {
+        if (settings.maxPlayers) {
+          room.settings.maxPlayers = Math.max(3, Math.min(12, settings.maxPlayers));
+        }
+        if (settings.roundsPerGame) {
+          room.settings.roundsPerGame = Math.max(1, Math.min(10, settings.roundsPerGame));
+        }
+        io.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
       }
     }
   });
