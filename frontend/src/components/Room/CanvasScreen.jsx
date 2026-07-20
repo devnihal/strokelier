@@ -46,6 +46,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
   const [localPendingPoints, setLocalPendingPoints] = useState([]);
   const [remotePendingStroke, setRemotePendingStroke] = useState(null);
   const [localStrokeCount, setLocalStrokeCount] = useState(0);
+  const [dismissFallback, setDismissFallback] = useState(false);
 
   useEffect(() => {
     // Reset stroke count and local state when turn changes
@@ -54,6 +55,19 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
     setLocalPendingPoints([]);
     setIsDrawing(false);
   }, [roomState.currentTurnIndex, isMyTurn]);
+
+  /**
+   * Handle missed socket events (like DRAW_STROKE_CLEARED) that occur when the browser
+   * goes into the background on mobile devices. This forces a sync with the authoritative
+   * server roomState to wipe local ghost strokes.
+   */
+  useEffect(() => {
+    if (!roomState.pendingStroke) {
+      setRemotePendingStroke(null);
+    }
+    // Any time we get a fresh full state update, we allow the fallback to show again
+    setDismissFallback(false);
+  }, [roomState]);
 
   // Re-draw canvas whenever strokes change or pending strokes update
   useEffect(() => {
@@ -102,11 +116,25 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
         remotePendingStroke.color,
         remotePendingStroke.width,
       );
+    } else if (
+      !isMyTurn &&
+      !dismissFallback &&
+      roomState.pendingStroke &&
+      roomState.pendingStroke.points.length > 0
+    ) {
+      // Fallback: render from full state if we just reconnected and missed the socket events
+      drawPoints(
+        roomState.pendingStroke.points,
+        roomState.pendingStroke.color,
+        roomState.pendingStroke.width,
+      );
     }
   }, [
     roomState.strokes,
+    roomState.pendingStroke,
     localPendingPoints,
     remotePendingStroke,
+    dismissFallback,
     isMyTurn,
     strokeColor,
     strokeWidth,
@@ -125,7 +153,10 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
 
   // Listen for remote draw events
   useEffect(() => {
-    const onRemoteStart = (stroke) => setRemotePendingStroke(stroke);
+    const onRemoteStart = (stroke) => {
+      setRemotePendingStroke(stroke);
+      setDismissFallback(true);
+    };
     const onRemotePoint = (pt) => {
       setRemotePendingStroke((prev) => {
         if (!prev) return prev;
@@ -137,6 +168,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
       setRemotePendingStroke(null);
       setLocalPendingPoints([]);
       setHasPendingStroke(false);
+      setDismissFallback(true);
     };
 
     socket.on("DRAW_STROKE_START_BROADCAST", onRemoteStart);

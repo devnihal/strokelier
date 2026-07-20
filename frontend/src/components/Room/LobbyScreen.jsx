@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "../common/Button";
+import DisconnectTimer from "../common/DisconnectTimer";
 import SettingsModal from "./SettingsModal";
 import "../../styles/Room/LobbyScreen.css";
 
@@ -190,6 +191,9 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                     <span className="roster-score" style={{ marginLeft: "8px", fontSize: "14px", color: "var(--bone-muted)" }}>{p.score} pts</span>
                     <span className="roster-leader"></span>
                     {p.isRoomOwner && <span className="roster-tag">HOST</span>}
+                    {!p.connected && p.disconnectTime && (
+                      <DisconnectTimer disconnectTime={p.disconnectTime} maxTime={120} />
+                    )}
                   </div>
                 );
               }

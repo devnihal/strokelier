@@ -88,6 +88,9 @@ export default function RoomScreen() {
         } else {
           setRoomState(response.state);
           setDisplayedState(response.state.state);
+          if (response.roleInfo) {
+            setRoleInfo(response.roleInfo);
+          }
         }
       }
     );

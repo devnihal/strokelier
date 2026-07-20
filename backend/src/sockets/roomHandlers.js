@@ -64,6 +64,13 @@ function registerRoomHandlers(io, socket, activeRooms) {
           player.connected = true;
           player.disconnectTime = null;
           player.name = name;
+
+          // If it's their turn, restore their full turn timer
+          if (room.state === 'DRAWING' && room.drawOrder[room.currentTurnIndex] === uid) {
+            if (room.startTurnTimer) {
+              room.startTurnTimer();
+            }
+          }
         }
       }
 
@@ -72,11 +79,22 @@ function registerRoomHandlers(io, socket, activeRooms) {
       socket.join(roomCode);
       socket.join(uid);
 
-      // Notify others
       socket.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
 
-      // Respond success
-      callback({ success: true, state: room.toPublicState() });
+      const response = { success: true, state: room.toPublicState() };
+      
+      /**
+       * If reconnecting during an active game, securely bundle their specific
+       * secret role and word into the private reconnect response.
+       */
+      if (room.state !== 'LOBBY' && room.state !== 'RESULTS' && player) {
+        response.roleInfo = {
+          role: player.isImposter ? 'imposter' : 'artist',
+          word: player.isImposter ? null : room.currentWord
+        };
+      }
+
+      callback(response);
 
     } catch (err) {
       console.error(err);
@@ -183,15 +201,21 @@ function registerRoomHandlers(io, socket, activeRooms) {
                 // Handle turn skipping
                 if (currentRoom.state === 'DRAWING' && currentRoom.drawOrder[currentRoom.currentTurnIndex] === uid) {
                   currentRoom.pendingStroke = null;
-                  currentRoom.currentTurnIndex++;
-                  if (currentRoom.currentTurnIndex >= currentRoom.drawOrder.length) {
-                    currentRoom.currentTurnIndex = 0;
-                    currentRoom.currentRoundNumber++;
+                  if (currentRoom.advanceTurn) {
+                    // Call advanceTurn to properly reset timers and notify players
+                    currentRoom.advanceTurn();
+                  } else {
+                    // Fallback
+                    currentRoom.currentTurnIndex++;
+                    if (currentRoom.currentTurnIndex >= currentRoom.drawOrder.length) {
+                      currentRoom.currentTurnIndex = 0;
+                      currentRoom.currentRoundNumber++;
+                    }
+                    if (currentRoom.currentRoundNumber > currentRoom.settings.roundsPerGame) {
+                      currentRoom.state = 'VOTING';
+                    }
+                    delayedStateChange = true;
                   }
-                  if (currentRoom.currentRoundNumber > currentRoom.settings.roundsPerGame) {
-                    currentRoom.state = 'VOTING';
-                  }
-                  delayedStateChange = true;
                 }
 
                 if (delayedStateChange) {

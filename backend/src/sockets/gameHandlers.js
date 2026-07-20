@@ -2,7 +2,18 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
   
   const startTurnTimer = (room) => {
     if (room.turnTimeoutId) clearTimeout(room.turnTimeoutId);
-    if (room.settings.drawTimeLimit) {
+    
+    const currentPlayerUid = room.drawOrder[room.currentTurnIndex];
+    const currentPlayer = room.players.get(currentPlayerUid);
+    const isOffline = currentPlayer && !currentPlayer.connected;
+
+    if (isOffline) {
+      // 10-second fast-forward if drawer is already offline when turn starts
+      room.turnStartTime = Date.now();
+      room.turnTimeoutId = setTimeout(() => {
+        handleTurnTimeout(room);
+      }, 10000);
+    } else if (room.settings.drawTimeLimit) {
       room.turnStartTime = Date.now();
       room.turnTimeoutId = setTimeout(() => {
         handleTurnTimeout(room);
@@ -36,6 +47,35 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
 
     // Check if drawing phase is over (rounds limit reached for this voting cycle)
     if (room.currentRoundNumber > room.settings.roundsPerGame) {
+      
+      // Before entering VOTING, instantly kick any offline players
+      let playersKicked = false;
+      let gameAborted = false;
+      for (const [uid, player] of room.players.entries()) {
+        if (!player.connected) {
+          room.removePlayer(uid);
+          playersKicked = true;
+
+          const imposterIdx = room.imposterUids.indexOf(uid);
+          if (imposterIdx !== -1) {
+            room.imposterUids.splice(imposterIdx, 1);
+          }
+
+          if (room.imposterUids.length === 0 || room.players.size < 3) {
+            gameAborted = true;
+          }
+        }
+      }
+
+      if (gameAborted) {
+        room.state = 'LOBBY';
+        room.turnTimeoutId = null;
+        room.turnStartTime = null;
+        room.pendingStroke = null;
+        io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
+        return;
+      }
+
       room.state = 'VOTING';
       room.turnStartTime = null;
       room.turnTimeoutId = null;
@@ -56,11 +96,14 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
   socket.on('GAME_START', () => {
     const roomCode = socket.data.roomCode;
     const uid = socket.data.uid;
-
     if (!roomCode) return;
-    
+
     const room = activeRooms.get(roomCode);
     if (!room) return;
+
+    // Attach methods to room for external access (cleanup/reconnect)
+    room.advanceTurn = () => advanceTurn(room);
+    room.startTurnTimer = () => startTurnTimer(room);
 
     if (room.ownerUid !== uid) {
       return; // Only owner can start

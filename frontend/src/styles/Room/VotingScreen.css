@@ -82,11 +82,6 @@
 .suspect-card-sketch:hover {
   transform: translateY(-4px);
 }
-.suspect-card-sketch.eliminated-hide {
-  transform: scale(0);
-  opacity: 0;
-  pointer-events: none;
-}
 .suspect-card-sketch.selected::before {
   border-color: var(--brass);
   border-width: 2px;

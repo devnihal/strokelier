@@ -1,30 +1,7 @@
 import React from "react";
 import "../../styles/Room/ScoreboardSidebar.css";
 
-const DisconnectTimer = ({ disconnectTime }) => {
-  const [timeLeft, setTimeLeft] = React.useState(10);
-  
-  React.useEffect(() => {
-    if (!disconnectTime) return;
-    
-    const updateTimer = () => {
-      const elapsed = Math.floor((Date.now() - disconnectTime) / 1000);
-      setTimeLeft(Math.max(0, 10 - elapsed));
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [disconnectTime]);
-
-  if (timeLeft === 0) return null;
-
-  return (
-    <span style={{ color: '#d9534f', fontSize: '12px', fontWeight: 'bold', marginLeft: '8px', fontVariantNumeric: 'tabular-nums' }}>
-      00:{timeLeft.toString().padStart(2, '0')}
-    </span>
-  );
-};
+import DisconnectTimer from "../common/DisconnectTimer";
 
 const TurnRingTimer = ({ turnStartTime, drawTimeLimit }) => {
   const [progress, setProgress] = React.useState(1);
@@ -185,7 +162,10 @@ export default function ScoreboardSidebar({
                   </>
                 )}
                 {!p.connected && p.disconnectTime && (
-                  <DisconnectTimer disconnectTime={p.disconnectTime} />
+                  <DisconnectTimer 
+                    disconnectTime={isDrawing ? Math.max(turnStartTime || 0, p.disconnectTime) : p.disconnectTime} 
+                    maxTime={isDrawing ? 10 : 120} 
+                  />
                 )}
               </div>
             </div>

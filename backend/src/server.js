@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const { registerHandlers, setupSocketMiddleware } = require('./sockets');
+const { startCleanupWorker } = require('./utils/cleanup');
 const logger = require('./utils/logger');
 
 const PORT = process.env.PORT || 3001;
@@ -42,6 +43,8 @@ io.on('connection', (socket) => {
   logger.log(`Socket connected: ${socket.id}`);
   registerHandlers(io, socket, activeRooms);
 });
+
+startCleanupWorker(io, activeRooms);
 
 server.listen(PORT, () => {
   logger.log(`Strokelier backend listening on port ${PORT}`);
