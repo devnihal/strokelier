@@ -9,6 +9,22 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
   const players = Object.values(roomState.players);
   const slots = Array(roomState.settings.maxPlayers).fill(null);
 
+  // Validation Logic
+  const activePlayers = players.length;
+  const impostorCount = roomState.settings.imposterCount || 1;
+  const hasCategories = roomState.settings.wordCategories && roomState.settings.wordCategories.length > 0;
+  const hasCustomWords = roomState.settings.customWords && roomState.settings.customWords.trim().length > 0;
+  const hasWords = hasCategories || hasCustomWords;
+
+  let startError = null;
+  if (activePlayers < 2) {
+    startError = "Need at least 2 players to start";
+  } else if (impostorCount >= activePlayers) {
+    startError = "Too many impostors! Must be fewer than players.";
+  } else if (!hasWords) {
+    startError = "Select word categories or add custom words.";
+  }
+
   const handleStartGame = () => {
     socket.emit("GAME_START");
   };
@@ -79,14 +95,14 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                 <Button
                   onClick={handleStartGame}
                   variant="primary"
-                  style={{ width: "100%", marginTop: "24px", opacity: (players.length + Object.keys(roomState.spectators || {}).length) < 2 ? 0.5 : 1 }}
-                  disabled={(players.length + Object.keys(roomState.spectators || {}).length) < 2}
+                  style={{ width: "100%", marginTop: "24px", opacity: startError !== null ? 0.5 : 1 }}
+                  disabled={startError !== null}
                 >
                   Commence Session
                 </Button>
-                {(players.length + Object.keys(roomState.spectators || {}).length) < 2 && (
-                  <p style={{ fontSize: "12px", color: "var(--bone-muted)", marginTop: "8px", textAlign: "center" }}>
-                    Need at least 2 people to start
+                {startError !== null && (
+                  <p style={{ fontSize: "12px", color: "var(--wax-red)", marginTop: "12px", textAlign: "center", fontWeight: "500", padding: "8px", background: "rgba(217, 65, 50, 0.1)", borderRadius: "4px" }}>
+                    ⚠️ {startError}
                   </p>
                 )}
                 {roomState.gamesPlayed >= 1 && (

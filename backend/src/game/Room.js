@@ -22,7 +22,7 @@ class Room {
       strokeLimit: 1, // null = infinite
       imposterCount: 1,
       anonymousVoting: false,
-      wordCategories: ['standard'],
+      wordCategories: ['standard', 'animals', 'objects', 'actions', 'places', 'food'],
       customWords: "",
       targetScore: 500,
       endCondition: 'rounds' // 'rounds' or 'score'
