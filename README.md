@@ -88,3 +88,4 @@ If you want to contribute to Strokelier, please adhere to the following rules:
 5. **Documentation Integrity**:
    - Preserve all existing comments and docstrings that are unrelated to your code changes. 
    - Ensure complex backend game logic and socket handlers remain well-documented for future maintainers.
+   - Do NOT clutter the codebase with unnecessary or obvious single-line comments. Let the code speak for itself where possible.
