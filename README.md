@@ -46,3 +46,41 @@ Strokelier is a multiplayer drawing and deception game inspired by the classic p
    ```
 
 3. Open your browser to `http://localhost:5173` (or the port Vite provides) and start playing!
+
+---
+
+## Architecture
+
+Strokelier is built around a **Server-Authoritative** real-time architecture:
+
+- **Backend (`/backend`)**:
+  - The game logic is entirely managed by the server using `socket.io`.
+  - The `Room.js` class is the heart of the system. It encapsulates the complete state of a single game lobby (players, settings, turn order, strokes, scores).
+  - The server manages timers, turn advancement, and validation. It broadcasts sanitized state snapshots (`roomState`) to clients every time an event mutates the game state.
+- **Frontend (`/frontend`)**:
+  - A React Single Page Application (SPA) that acts primarily as a reactive view layer.
+  - The main `App.jsx` connects to the WebSocket server and listens for `ROOM_STATE_UPDATE` events.
+  - Depending on the `roomState.state` (e.g., `LOBBY`, `DRAWING`, `VOTING`, `RESULTS`), the frontend dynamically renders the appropriate Screen component.
+  - The frontend never trusts itself. It sends "intent" events (like `DRAW_COMMIT_STROKE` or `SUBMIT_VOTE`) to the server, and only updates the visual UI when the server confirms the state change.
+
+## Contribution Guidelines
+
+If you want to contribute to Strokelier, please adhere to the following rules:
+
+1. **Vanilla CSS Only**:
+   - Do NOT introduce TailwindCSS, styled-components, or other CSS-in-JS libraries.
+   - All styles must be written in standard CSS.
+   - Always rely on the global CSS tokens defined in `frontend/src/styles/tokens.css` (e.g., `var(--bone)`, `var(--wax-red)`, `var(--font-heading)`) to maintain the premium aesthetic and dark mode harmony.
+
+2. **Server-Authoritative Logic**:
+   - Never implement game rules or timer logic purely on the frontend.
+   - The frontend should only be responsible for rendering data and catching user input.
+   - Ensure the backend properly sanitizes broadcasted data (e.g., do not leak the Impostor's identity or the secret word in the public room state until the `RESULTS` phase).
+
+3. **Component Modularity**:
+   - Keep React components small and focused.
+   - Screen-level components should reside in `frontend/src/components/Room/` and smaller reusable UI parts (buttons, avatars) should reside in `frontend/src/components/common/`.
+   - Maintain the one-to-one mapping of components to CSS files in the `styles/` directory.
+
+4. **Socket Management**:
+   - Always properly clean up socket event listeners in `useEffect` return statements to prevent memory leaks and duplicate firing upon re-renders.
