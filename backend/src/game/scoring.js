@@ -3,37 +3,46 @@
  * This is a pure function.
  * 
  * @param {Array<Object>} players - Array of player objects { uid, score, isImposter }
- * @param {Object} votes - Map/Object of voterUid -> votedUid
- * @param {string} imposterUid - The UID of the imposter
+ * @param {Object} votes - Map/Object of voterUid -> Array of votedUids
+ * @param {Array<string>} imposterUids - The UIDs of the imposters
  * @returns {Object} scoreUpdates - A map of uid -> score delta
  */
-function calculateScores(players, votes, imposterUid) {
+function calculateScores(players, votes, imposterUids) {
   const scoreUpdates = {};
   
-  // Initialize deltas
   for (const player of players) {
     scoreUpdates[player.uid] = 0;
   }
 
-  // Count non-imposter players (n)
-  let n = 0;
-  for (const player of players) {
-    if (!player.isImposter) n++;
-  }
-
-  // Count correct votes (k)
-  let k = 0;
-  for (const player of players) {
-    if (player.isImposter) continue;
-    const votedFor = votes[player.uid];
-    if (votedFor === imposterUid) {
-      k++;
-      scoreUpdates[player.uid] += 100; // Correct voters get 100
+  const artists = players.filter(p => !p.isImposter);
+  
+  // Calculate for each artist
+  for (const artist of artists) {
+    const votedFor = votes[artist.uid] || [];
+    let correctGuesses = 0;
+    
+    for (const vote of votedFor) {
+      if (imposterUids.includes(vote)) {
+        correctGuesses++;
+        // Give artist points
+        scoreUpdates[artist.uid] += 100;
+        // Deduct points from caught imposter (effectively, they don't get the 100 point bonus)
+      }
     }
   }
 
-  // Imposter gets 100 * (n - k)
-  scoreUpdates[imposterUid] += 100 * (n - k);
+  // Calculate for imposters
+  // Imposter gets 100 points for every artist that DID NOT vote for them
+  for (const imposterUid of imposterUids) {
+    let artistsFooled = 0;
+    for (const artist of artists) {
+      const artistVotes = votes[artist.uid] || [];
+      if (!artistVotes.includes(imposterUid)) {
+        artistsFooled++;
+      }
+    }
+    scoreUpdates[imposterUid] += (100 * artistsFooled);
+  }
 
   return scoreUpdates;
 }

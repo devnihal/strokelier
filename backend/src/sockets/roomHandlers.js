@@ -105,12 +105,23 @@ function registerRoomHandlers(io, socket, activeRooms) {
     if (roomCode && uid && settings) {
       const room = activeRooms.get(roomCode);
       if (room && room.ownerUid === uid && room.state === 'LOBBY') {
-        if (settings.maxPlayers) {
-          room.settings.maxPlayers = Math.max(3, Math.min(12, settings.maxPlayers));
+        if (settings.maxPlayers !== undefined) {
+          room.settings.maxPlayers = Math.max(3, Math.min(20, settings.maxPlayers));
         }
-        if (settings.roundsPerGame) {
+        if (settings.roundsPerGame !== undefined) {
           room.settings.roundsPerGame = Math.max(1, Math.min(10, settings.roundsPerGame));
         }
+        if (settings.drawTimeLimit !== undefined) room.settings.drawTimeLimit = settings.drawTimeLimit;
+        if (settings.strokeLimit !== undefined) room.settings.strokeLimit = settings.strokeLimit;
+        if (settings.imposterCount !== undefined) {
+          room.settings.imposterCount = Math.max(1, Math.min(5, settings.imposterCount));
+        }
+        if (settings.anonymousVoting !== undefined) room.settings.anonymousVoting = !!settings.anonymousVoting;
+        if (settings.wordCategories !== undefined) room.settings.wordCategories = settings.wordCategories;
+        if (settings.customWords !== undefined) room.settings.customWords = settings.customWords;
+        if (settings.targetScore !== undefined) room.settings.targetScore = Math.max(100, settings.targetScore);
+        if (settings.endCondition !== undefined) room.settings.endCondition = settings.endCondition;
+
         io.to(roomCode).emit('ROOM_STATE_UPDATE', room.toPublicState());
       }
     }

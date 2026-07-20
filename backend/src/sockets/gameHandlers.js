@@ -1,5 +1,55 @@
 module.exports = function registerGameHandlers(io, socket, activeRooms) {
   
+  const startTurnTimer = (room) => {
+    if (room.turnTimeoutId) clearTimeout(room.turnTimeoutId);
+    if (room.settings.drawTimeLimit) {
+      room.turnStartTime = Date.now();
+      room.turnTimeoutId = setTimeout(() => {
+        handleTurnTimeout(room);
+      }, room.settings.drawTimeLimit * 1000);
+    } else {
+      room.turnStartTime = null;
+      room.turnTimeoutId = null;
+    }
+  };
+
+  const handleTurnTimeout = (room) => {
+    if (room.pendingStroke) {
+      room.strokes.push(room.pendingStroke);
+      const committedStroke = room.pendingStroke;
+      room.pendingStroke = null;
+      io.to(room.code).emit('DRAW_STROKE_COMMITTED', { stroke: committedStroke });
+    }
+    advanceTurn(room);
+  };
+
+  const advanceTurn = (room) => {
+    if (room.turnTimeoutId) clearTimeout(room.turnTimeoutId);
+    
+    room.currentTurnIndex++;
+    
+    // Check if round is over
+    if (room.currentTurnIndex >= room.drawOrder.length) {
+      room.currentTurnIndex = 0;
+      room.currentRoundNumber++;
+    }
+
+    // Check if drawing phase is over (rounds limit reached for this voting cycle)
+    if (room.currentRoundNumber > room.settings.roundsPerGame) {
+      room.state = 'VOTING';
+      room.turnStartTime = null;
+      room.turnTimeoutId = null;
+      io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
+    } else {
+      startTurnTimer(room);
+      io.to(room.code).emit('DRAW_TURN_CHANGED', { 
+        currentTurnIndex: room.currentTurnIndex,
+        currentRoundNumber: room.currentRoundNumber
+      });
+      io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
+    }
+  };
+
   /**
    * Starts the game from the LOBBY state.
    */
@@ -16,7 +66,7 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
       return; // Only owner can start
     }
 
-    if (room.state !== 'LOBBY') {
+    if (room.state !== 'LOBBY' && room.state !== 'RESULTS') {
       return; // Already started
     }
 
@@ -34,18 +84,27 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
     room.drawOrder = playerIds;
     room.currentTurnIndex = 0;
 
-    // Pick an imposter
-    const imposterIndex = Math.floor(Math.random() * playerIds.length);
-    room.imposterUid = playerIds[imposterIndex];
+    // Pick imposters
+    const numImposters = Math.min(room.settings.imposterCount || 1, playerIds.length - 1);
+    room.imposterUids = [];
+    let availableIds = [...playerIds];
+    for(let i=0; i<numImposters; i++){
+      if(availableIds.length === 0) break;
+      const idx = Math.floor(Math.random() * availableIds.length);
+      room.imposterUids.push(availableIds[idx]);
+      availableIds.splice(idx, 1);
+    }
 
     // Mark the player objects as imposter for server logic (stripped before emit)
     for (const [pUid, p] of room.players.entries()) {
-      p.isImposter = (pUid === room.imposterUid);
+      p.isImposter = room.imposterUids.includes(pUid);
     }
 
-    // Set the secret word (placeholder word bank for now)
-    const words = ["Mona Lisa", "Eiffel Tower", "Banana", "Dragon", "Spaceship"];
-    room.currentWord = words[Math.floor(Math.random() * words.length)];
+    // Set the secret word using wordLoader
+    const { getRandomWord } = require('../game/wordLoader');
+    room.currentWord = getRandomWord(room.settings, room.usedWords);
+
+    startTurnTimer(room);
 
     // Send roles to everyone in a single bulk broadcast to guarantee delivery
     const rolesMap = {};
@@ -55,13 +114,10 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
         word: p.isImposter ? null : room.currentWord 
       };
     }
-    // Inject rolesMap into the ROOM_STATE_UPDATE payload just for this GAME_START event
-    // This absolutely guarantees that if the client receives the countdown (state transition),
-    // they also receive the roles in the exact same packet.
+    
     const publicState = room.toPublicState();
     publicState.rolesMap = rolesMap;
     
-    console.log("GAME_START: Emitting ROOM_STATE_UPDATE with injected rolesMap to", roomCode);
     io.to(roomCode).emit('ROOM_STATE_UPDATE', publicState);
   });
 
@@ -125,7 +181,9 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
     const roomCode = socket.data.roomCode;
     const room = activeRooms.get(roomCode);
     if (!room || room.ownerUid !== socket.data.uid) return;
-    if (room.state !== 'LOBBY' || room.gamesPlayed < 1) return;
+    if (room.state !== 'LOBBY' && room.gamesPlayed < 1) return;
+
+    if(room.turnTimeoutId) clearTimeout(room.turnTimeoutId);
 
     room.state = 'LEADERBOARD';
     io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
@@ -146,39 +204,32 @@ module.exports = function registerGameHandlers(io, socket, activeRooms) {
     io.to(context.room.code).emit('DRAW_STROKE_CLEARED');
   });
 
-  socket.on('DRAW_NEXT_PLAYER', () => {
+  socket.on('DRAW_COMMIT_STROKE', () => {
     const context = getActiveRoomAndValidateTurn(socket);
     if (!context || !context.room.pendingStroke) return;
     const { room } = context;
-    
-    // Commit stroke
+
     room.strokes.push(room.pendingStroke);
     const committedStroke = room.pendingStroke;
     room.pendingStroke = null;
-    
+
     io.to(room.code).emit('DRAW_STROKE_COMMITTED', { stroke: committedStroke });
+  });
 
-    // Advance turn
-    room.currentTurnIndex++;
+  socket.on('DRAW_NEXT_PLAYER', () => {
+    const context = getActiveRoomAndValidateTurn(socket);
+    if (!context) return;
+    const { room } = context;
     
-    // Check if round is over
-    if (room.currentTurnIndex >= room.drawOrder.length) {
-      room.currentTurnIndex = 0;
-      room.currentRoundNumber++;
+    if (room.pendingStroke) {
+      // Commit stroke before advancing
+      room.strokes.push(room.pendingStroke);
+      const committedStroke = room.pendingStroke;
+      room.pendingStroke = null;
+      io.to(room.code).emit('DRAW_STROKE_COMMITTED', { stroke: committedStroke });
     }
 
-    // Check if game is over (all rounds done)
-    if (room.currentRoundNumber > room.settings.roundsPerGame) {
-      room.state = 'VOTING';
-      io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
-    } else {
-      io.to(room.code).emit('DRAW_TURN_CHANGED', { 
-        currentTurnIndex: room.currentTurnIndex,
-        currentRoundNumber: room.currentRoundNumber
-      });
-      // Also broadcast general state update just in case
-      io.to(room.code).emit('ROOM_STATE_UPDATE', room.toPublicState());
-    }
+    advanceTurn(room);
   });
 
 };

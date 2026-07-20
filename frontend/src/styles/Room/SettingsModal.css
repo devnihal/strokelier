@@ -1,0 +1,343 @@
+.settings-modal-container {
+  max-width: 500px !important;
+  width: 95% !important;
+  border: 2px solid var(--brass) !important;
+  background: var(--studio-wall) !important;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.settings-scroll-area {
+  text-align: left;
+  margin-top: 24px;
+  padding: 0 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Custom scrollbar for settings */
+.settings-scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+.settings-scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.settings-scroll-area::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 4px;
+}
+
+.setting-group {
+  margin-bottom: 24px;
+}
+
+.setting-group.indent {
+  margin-left: 16px;
+  margin-top: -12px;
+}
+
+.setting-group > label {
+  display: block;
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--bone-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.setting-group input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  filter: url(#sketch-filter-1);
+}
+
+.setting-group input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 4px;
+  background: var(--hairline);
+  border-radius: 2px;
+}
+
+.setting-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: var(--brass);
+  margin-top: -6px;
+  border: 2px solid var(--charcoal);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  transition: transform 0.1s;
+}
+
+.setting-group input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.segment-control {
+  position: relative;
+  display: flex;
+  background: var(--studio-wall);
+  border: 2px solid var(--hairline);
+  border-radius: 8px;
+  padding: 4px;
+  cursor: pointer;
+  filter: url(#sketch-filter-1);
+  overflow: hidden;
+  height: 36px;
+}
+
+.segment-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 4px);
+  background: var(--brass);
+  border-radius: 4px;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 0;
+}
+
+.segment-control.rounds .segment-indicator {
+  transform: translateX(0);
+}
+
+.segment-control.score .segment-indicator {
+  transform: translateX(100%);
+}
+
+.segment-label {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--bone);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+}
+
+.segment-label.active {
+  color: var(--charcoal);
+  font-weight: 600;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkbox label,
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--bone);
+  cursor: pointer;
+}
+
+/* Hide default inputs */
+.radio-group input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-list input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--hairline);
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  position: relative;
+  transition: all 0.2s;
+  filter: url(#sketch-filter-1);
+}
+
+/* Radio is circle */
+.radio-group input[type="radio"] {
+  border-radius: 50%;
+}
+
+/* Checkbox is square slightly rounded */
+.checkbox input[type="checkbox"],
+.checkbox-list input[type="checkbox"] {
+  border-radius: 4px;
+}
+
+/* Checked state border */
+.radio-group input[type="radio"]:checked,
+.checkbox input[type="checkbox"]:checked,
+.checkbox-list input[type="checkbox"]:checked {
+  border-color: var(--brass);
+}
+
+/* Inner checked shape for radio */
+.radio-group input[type="radio"]::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--brass);
+  transform: scale(0);
+  transition: 0.2s transform;
+}
+.radio-group input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+/* Inner checked shape for checkbox (check mark) */
+.checkbox input[type="checkbox"]::before,
+.checkbox-list input[type="checkbox"]::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: var(--brass);
+  transform: scale(0);
+  transition: 0.2s transform;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.checkbox input[type="checkbox"]:checked::before,
+.checkbox-list input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.checkbox-list label.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.checkbox-list label.disabled input {
+  cursor: not-allowed;
+}
+
+/* Toggle Switch Styles */
+.setting-group.toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.setting-group.toggle-group span {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--bone);
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: transparent;
+  border: 2px solid var(--hairline);
+  transition: .4s;
+  border-radius: 24px;
+  filter: url(#sketch-filter-1);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--hairline);
+  transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  border-color: var(--brass);
+}
+
+input:checked + .toggle-slider:before {
+  left: calc(100% - 17px);
+  background-color: var(--brass);
+}
+
+.textarea-container {
+  position: relative;
+  width: 100%;
+  height: 80px;
+}
+
+.textarea-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid var(--hairline);
+  border-radius: 4px;
+  pointer-events: none; /* Let clicks pass through to textarea */
+  filter: url(#sketch-filter-1);
+  transition: border-color 0.2s;
+}
+
+.textarea-container:focus-within::before {
+  border-color: var(--brass);
+}
+
+.setting-group textarea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  color: var(--bone);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  resize: vertical;
+  z-index: 1;
+}
+
+.setting-group textarea:focus {
+  outline: none;
+}
+
+.nsfw-warning {
+  color: var(--wax-red);
+  font-size: 11px;
+  font-family: var(--font-code);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.settings-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px 24px;
+  border-top: 1px solid var(--hairline);
+  margin-top: 16px;
+}

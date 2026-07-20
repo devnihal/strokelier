@@ -80,12 +80,10 @@
   letter-spacing: 0.1em;
 }
 
-.forger-stamp {
+.forger-stamp, .caught-stamp {
   position: absolute;
   top: -6px;
   right: -32px;
-  border: 2px solid var(--wax-red);
-  color: var(--wax-red);
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 600;
@@ -98,6 +96,16 @@
   transform: rotate(8deg) scale(1.6);
   animation: slam 480ms cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
   animation-delay: 200ms;
+}
+
+.forger-stamp {
+  border: 2px solid var(--wax-red);
+  color: var(--wax-red);
+}
+
+.caught-stamp {
+  border: 2px solid var(--wax-green);
+  color: var(--wax-green);
 }
 
 @keyframes slam { 

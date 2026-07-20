@@ -45,6 +45,15 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
   // Local stroke state for rendering
   const [localPendingPoints, setLocalPendingPoints] = useState([]);
   const [remotePendingStroke, setRemotePendingStroke] = useState(null);
+  const [localStrokeCount, setLocalStrokeCount] = useState(0);
+
+  useEffect(() => {
+    // Reset stroke count and local state when turn changes
+    setLocalStrokeCount(0);
+    setHasPendingStroke(false);
+    setLocalPendingPoints([]);
+    setIsDrawing(false);
+  }, [roomState.currentTurnIndex, isMyTurn]);
 
   // Re-draw canvas whenever strokes change or pending strokes update
   useEffect(() => {
@@ -154,6 +163,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
 
   const handlePointerDown = (e) => {
     if (!isMyTurn || hasPendingStroke) return;
+    if (roomState.settings.strokeLimit && localStrokeCount >= roomState.settings.strokeLimit) return;
     setIsDrawing(true);
     const pt = getNormPos(e);
     setLocalPendingPoints([pt]);
@@ -186,10 +196,18 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
     setHasPendingStroke(false);
   };
 
+  const handleCommitStroke = () => {
+    socket.emit("DRAW_COMMIT_STROKE");
+    setLocalPendingPoints([]);
+    setHasPendingStroke(false);
+    setLocalStrokeCount(prev => prev + 1);
+  };
+
   const handleNextPlayer = () => {
     socket.emit("DRAW_NEXT_PLAYER");
     setLocalPendingPoints([]);
     setHasPendingStroke(false);
+    setLocalStrokeCount(0);
   };
 
   return (
@@ -225,55 +243,74 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
             />
           </div>
 
-          {isMyTurn && !hasPendingStroke && (
-            <div className="drawing-tools">
-              <div className="tool-group">
-                <label>Thickness</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  value={strokeWidth}
-                  onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                  style={{ '--thickness': `${strokeWidth}px` }}
-                />
-              </div>
-              <div className="tool-group colors">
-                {COLORS.map((c) => (
-                  <button
-                    key={c}
-                    className={`color-swatch ${strokeColor === c ? "active" : ""}`}
-                    style={{ backgroundColor: c }}
-                    onClick={() => setStrokeColor(c)}
+            {isMyTurn && !hasPendingStroke && (
+              <div className="drawing-tools">
+                <div className="tool-group">
+                  <label>Thickness</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={strokeWidth}
+                    onChange={(e) => setStrokeWidth(Number(e.target.value))}
+                    style={{ '--thickness': `${strokeWidth}px` }}
                   />
-                ))}
+                </div>
+                <div className="tool-group colors">
+                  {COLORS.map((c) => (
+                    <button
+                      key={c}
+                      className={`color-swatch ${strokeColor === c ? "active" : ""}`}
+                      style={{ backgroundColor: c }}
+                      onClick={() => setStrokeColor(c)}
+                    />
+                  ))}
+                </div>
+                {roomState.settings.strokeLimit && (
+                  <div className="tool-group stroke-limit" style={{ color: 'var(--brass)', fontFamily: 'var(--font-code)', fontSize: '12px', display: 'flex', alignItems: 'center' }}>
+                    Strokes: {localStrokeCount} / {roomState.settings.strokeLimit}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          {isMyTurn && (
-            <div className="canvas-actions">
-              <Button
-                onClick={handleRetry}
-                disabled={!hasPendingStroke}
-                className="btn-retry"
-              >
-                Retry Stroke
-              </Button>
-              <Button onClick={handleNextPlayer} disabled={!hasPendingStroke}>
-                End Turn
-              </Button>
-            </div>
-          )}
+            {isMyTurn && (
+              <div className="canvas-actions">
+                <Button
+                  onClick={handleRetry}
+                  disabled={!hasPendingStroke}
+                  className="btn-retry"
+                >
+                  Retry Stroke
+                </Button>
+                {(!roomState.settings.strokeLimit || localStrokeCount + 1 < roomState.settings.strokeLimit) ? (
+                  <Button onClick={handleCommitStroke} disabled={!hasPendingStroke}>
+                    Commit Stroke
+                  </Button>
+                ) : (
+                  <Button onClick={handleNextPlayer} disabled={!hasPendingStroke && (roomState.settings.strokeLimit ? localStrokeCount === 0 : true)}>
+                    End Turn
+                  </Button>
+                )}
+                {/* Fallback end turn if they just want to skip remaining strokes */}
+                {(!roomState.settings.strokeLimit || localStrokeCount + 1 < roomState.settings.strokeLimit) && (
+                  <Button onClick={handleNextPlayer} style={{ background: 'transparent', border: '1px solid var(--hairline)', color: 'var(--bone-muted)' }}>
+                    End Turn
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+
+          <ScoreboardSidebar
+            players={roomState.players}
+            currentTurnUid={currentTurnUid}
+            ownerUid={roomState.ownerUid}
+            myUid={myPlayer?.uid}
+            turnStartTime={roomState.turnStartTime}
+            drawTimeLimit={roomState.settings.drawTimeLimit}
+          />
         </div>
-
-        <ScoreboardSidebar
-          players={roomState.players}
-          currentTurnUid={currentTurnUid}
-          ownerUid={roomState.ownerUid}
-          myUid={myPlayer?.uid}
-        />
-      </div>
     </div>
   );
 }

@@ -18,20 +18,30 @@ class Room {
     this.settings = {
       maxPlayers: 8,
       roundsPerGame: 3,
-      wordBank: null,
+      drawTimeLimit: null, // null = infinite
+      strokeLimit: 1, // null = infinite
+      imposterCount: 1,
+      anonymousVoting: false,
+      wordCategories: ['standard'],
+      customWords: "",
+      targetScore: 500,
+      endCondition: 'rounds' // 'rounds' or 'score'
     };
     this.state = 'LOBBY';
     this.currentWord = null;
-    this.imposterUid = null;
+    this.imposterUids = [];
     this.drawOrder = [];
     this.currentTurnIndex = 0;
     this.currentRoundNumber = 1;
+    this.turnStartTime = null;
+    this.turnTimeoutId = null;
     this.strokes = [];
     this.pendingStroke = null;
     this.votes = new Map(); // voterUid -> votedUid
     this.createdAt = Date.now();
     this.emptySince = null;
     this.gamesPlayed = 0;
+    this.usedWords = new Set();
   }
 
   /**
@@ -49,6 +59,14 @@ class Room {
       publicSpectators[uid] = { uid: spec.uid, name: spec.name };
     }
 
+    let publicVotes = Object.fromEntries(this.votes);
+    if (this.state === 'VOTING' && this.settings.anonymousVoting) {
+      publicVotes = {};
+      for (const voterUid of this.votes.keys()) {
+        publicVotes[voterUid] = true; // Scrub target
+      }
+    }
+
     return {
       code: this.code,
       ownerUid: this.ownerUid,
@@ -57,16 +75,17 @@ class Room {
       settings: this.settings,
       state: this.state,
       // Imposter and word are hidden from the public state UNLESS the game is over
-      imposterUid: this.state === 'RESULTS' ? this.imposterUid : undefined,
+      imposterUids: this.state === 'RESULTS' ? this.imposterUids : undefined,
       currentWord: this.state === 'RESULTS' ? this.currentWord : undefined,
       lastScoreUpdates: this.state === 'RESULTS' ? this.lastScoreUpdates : undefined,
       drawOrder: this.drawOrder,
       currentTurnIndex: this.currentTurnIndex,
       currentRoundNumber: this.currentRoundNumber,
+      turnStartTime: this.turnStartTime,
       gamesPlayed: this.gamesPlayed,
       strokes: this.strokes,
       pendingStroke: this.pendingStroke,
-      votes: Object.fromEntries(this.votes),
+      votes: publicVotes,
       createdAt: this.createdAt,
     };
   }

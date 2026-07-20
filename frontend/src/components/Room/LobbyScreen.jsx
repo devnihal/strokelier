@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import Button from "../common/Button";
+import SettingsModal from "./SettingsModal";
 import "../../styles/Room/LobbyScreen.css";
 
 export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
   const [showSettings, setShowSettings] = useState(false);
-  const [tempMaxPlayers, setTempMaxPlayers] = useState(roomState.settings.maxPlayers);
-  const [tempRounds, setTempRounds] = useState(roomState.settings.roundsPerGame);
 
   const players = Object.values(roomState.players);
   const slots = Array(roomState.settings.maxPlayers).fill(null);
@@ -26,11 +25,7 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
             <h3 style={{ margin: 0, padding: 0, fontSize: '20px' }}>Session Ledger</h3>
             {isOwner && (
               <button 
-                onClick={() => {
-                  setTempMaxPlayers(roomState.settings.maxPlayers);
-                  setTempRounds(roomState.settings.roundsPerGame);
-                  setShowSettings(true);
-                }}
+                onClick={() => setShowSettings(true)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', color: 'var(--brass)' }}
                 title="Settings"
               >
@@ -49,19 +44,31 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
             </button>
           </div>
 
-          <div style={{ textAlign: "left", marginTop: "24px" }}>
-            <div className="ledger-row">
-              <span className="field-label">Max Artists</span>
+          <div style={{ textAlign: "left", marginTop: "24px", fontSize: "14px" }}>
+            <div className="ledger-row" style={{ marginBottom: "8px" }}>
+              <span className="field-label" style={{ color: "var(--bone-muted)" }}>Win Condition</span>
               <span className="leader"></span>
               <span className="field-value">
-                {roomState.settings.maxPlayers}
+                {roomState.settings.endCondition === 'score' 
+                  ? `First to ${roomState.settings.targetScore} pts` 
+                  : `${roomState.settings.roundsPerGame} Rounds`}
               </span>
             </div>
-            <div className="ledger-row">
-              <span className="field-label">Rounds</span>
+            <div className="ledger-row" style={{ marginBottom: "8px" }}>
+              <span className="field-label" style={{ color: "var(--bone-muted)" }}>Artists</span>
+              <span className="leader"></span>
+              <span className="field-value">Max {roomState.settings.maxPlayers}</span>
+            </div>
+            <div className="ledger-row" style={{ marginBottom: "8px" }}>
+              <span className="field-label" style={{ color: "var(--bone-muted)" }}>Imposters</span>
+              <span className="leader"></span>
+              <span className="field-value">{roomState.settings.imposterCount || 1}</span>
+            </div>
+            <div className="ledger-row" style={{ marginBottom: "8px" }}>
+              <span className="field-label" style={{ color: "var(--bone-muted)" }}>Time / Strokes</span>
               <span className="leader"></span>
               <span className="field-value">
-                {roomState.settings.roundsPerGame}
+                {roomState.settings.drawTimeLimit ? `${roomState.settings.drawTimeLimit}s` : '∞'} / {roomState.settings.strokeLimit ? `${roomState.settings.strokeLimit}` : '∞'}
               </span>
             </div>
           </div>
@@ -120,15 +127,12 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
               ].map((c, i) => {
                 const isTaken = players.some(p => p.uid !== myPlayer.uid && p.color === c);
                 const isSelected = myPlayer.color === c;
-                // Generate a pseudo-random looking deterministic rotation between roughly -35 and +35
-                const rotation = (i % 2 === 0 ? 1 : -1) * (8 + (i * 17) % 25);
                 return (
                   <div
                     key={c}
                     className={`swatch ${isSelected ? "selected" : ""} ${isTaken ? "taken" : ""}`}
                     style={{
                       backgroundColor: c,
-                      transform: `rotate(${rotation}deg)`,
                       cursor: isTaken ? "not-allowed" : "pointer"
                     }}
                     onClick={() => {
@@ -190,46 +194,14 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
       </div>
 
       {showSettings && (
-        <div className="modal-scrim open" style={{ zIndex: 100 }}>
-          <div className="shape-citadel play theme-word" style={{ maxWidth: '400px', width: '90%', border: '2px solid var(--brass)', background: 'var(--studio-wall)' }}>
-            <span className="popup-header-label" style={{ color: 'var(--brass)' }}>Studio Settings</span>
-            <div style={{ textAlign: "left", marginTop: "24px", padding: "0 24px" }}>
-              
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{ display: "block", fontFamily: "var(--font-code)", fontSize: "11px", color: "var(--bone-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Max Artists: {tempMaxPlayers}</label>
-                <input
-                  type="range"
-                  min="3"
-                  max="12"
-                  value={tempMaxPlayers}
-                  onChange={(e) => setTempMaxPlayers(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--brass)", cursor: "pointer", filter: "url(#sketch-filter-1)" }}
-                />
-              </div>
-
-              <div style={{ marginBottom: "32px" }}>
-                <label style={{ display: "block", fontFamily: "var(--font-code)", fontSize: "11px", color: "var(--bone-muted)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Rounds: {tempRounds}</label>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={tempRounds}
-                  onChange={(e) => setTempRounds(Number(e.target.value))}
-                  style={{ width: "100%", accentColor: "var(--brass)", cursor: "pointer", filter: "url(#sketch-filter-1)" }}
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", paddingBottom: "24px" }}>
-                <Button variant="secondary" onClick={() => setShowSettings(false)}>Cancel</Button>
-                <Button variant="primary" onClick={() => {
-                  socket.emit("UPDATE_SETTINGS", { maxPlayers: tempMaxPlayers, roundsPerGame: tempRounds });
-                  setShowSettings(false);
-                }}>Save</Button>
-              </div>
-
-            </div>
-          </div>
-        </div>
+        <SettingsModal 
+          settings={roomState.settings} 
+          onClose={() => setShowSettings(false)} 
+          onSave={(newSettings) => {
+            socket.emit("UPDATE_SETTINGS", newSettings);
+            setShowSettings(false);
+          }}
+        />
       )}
     </div>
   );
