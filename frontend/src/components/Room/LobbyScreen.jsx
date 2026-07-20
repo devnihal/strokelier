@@ -101,8 +101,8 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                   Commence Session
                 </Button>
                 {startError !== null && (
-                  <p style={{ fontSize: "12px", color: "var(--wax-red)", marginTop: "12px", textAlign: "center", fontWeight: "500", padding: "8px", background: "rgba(217, 65, 50, 0.1)", borderRadius: "4px" }}>
-                    ⚠️ {startError}
+                  <p style={{ fontSize: "12px", color: "var(--wax-red)", marginTop: "12px", textAlign: "center" }}>
+                    {startError}
                   </p>
                 )}
                 {roomState.gamesPlayed >= 1 && (

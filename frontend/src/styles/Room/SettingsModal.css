@@ -5,7 +5,7 @@
   background: var(--studio-wall) !important;
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 90dvh;
 }
 
 .settings-scroll-area {
@@ -306,6 +306,27 @@ input:checked + .toggle-slider:before {
   border-color: var(--brass);
 }
 
+.textarea-backdrop {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  padding: 8px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: normal;
+  color: var(--bone); /* Make text visible in backdrop */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.textarea-backdrop mark {
+  background-color: transparent;
+  color: var(--wax-red); /* Make the flagged text red */
+  border-bottom: none; /* Remove underline */
+}
+
 .setting-group textarea {
   position: relative;
   width: 100%;
@@ -313,11 +334,22 @@ input:checked + .toggle-slider:before {
   background: transparent;
   border: none;
   padding: 8px;
-  color: var(--bone);
+  color: transparent; /* Hide real text */
+  caret-color: var(--bone); /* Keep cursor visible */
   font-family: var(--font-ui);
   font-size: 14px;
+  line-height: normal;
   resize: vertical;
   z-index: 1;
+}
+
+.setting-group textarea::selection {
+  background: rgba(255, 246, 229, 0.2);
+  color: transparent;
+}
+
+.textarea-container:has(textarea.has-error)::before {
+  border-color: var(--wax-red);
 }
 
 .setting-group textarea:focus {
