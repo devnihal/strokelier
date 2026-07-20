@@ -89,3 +89,8 @@ If you want to contribute to Strokelier, please adhere to the following rules:
    - Preserve all existing comments and docstrings that are unrelated to your code changes. 
    - Ensure complex backend game logic and socket handlers remain well-documented for future maintainers.
    - Do NOT clutter the codebase with unnecessary or obvious single-line comments. Let the code speak for itself where possible.
+
+6. **Environment-Aware Logging**:
+   - Do NOT use native `console.log` or `console.error` anywhere in the codebase.
+   - Always import and use the custom logger utility (`src/utils/logger.js`) for both frontend and backend.
+   - This ensures that debug logs are strictly confined to local and testing environments and never leak into production.

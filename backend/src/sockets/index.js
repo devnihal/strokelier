@@ -1,6 +1,7 @@
 const registerRoomHandlers = require('./roomHandlers');
 const registerGameHandlers = require('./gameHandlers');
 const registerVoteHandlers = require('./voteHandlers');
+const logger = require('../utils/logger');
 
 /**
  * Attaches middleware to the socket server.
@@ -26,7 +27,7 @@ function registerHandlers(io, socket, activeRooms) {
   registerVoteHandlers(io, socket, activeRooms);
 
   socket.on('disconnect', () => {
-    console.log(`Socket disconnected: ${socket.id}`);
+    logger.log(`Socket disconnected: ${socket.id}`);
   });
 }
 

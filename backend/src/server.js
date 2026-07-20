@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const { registerHandlers, setupSocketMiddleware } = require('./sockets');
+const logger = require('./utils/logger');
 
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -38,10 +39,10 @@ const io = new Server(server, {
 setupSocketMiddleware(io);
 
 io.on('connection', (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
+  logger.log(`Socket connected: ${socket.id}`);
   registerHandlers(io, socket, activeRooms);
 });
 
 server.listen(PORT, () => {
-  console.log(`Strokelier backend listening on port ${PORT}`);
+  logger.log(`Strokelier backend listening on port ${PORT}`);
 });

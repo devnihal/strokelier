@@ -6,6 +6,7 @@ import LobbyScreen from "./LobbyScreen";
 import CanvasScreen from "./CanvasScreen";
 import VotingScreen from "./VotingScreen";
 import ResultsScreen from "./ResultsScreen";
+import { log } from "../../utils/logger";
 import LeaderboardScreen from "./LeaderboardScreen";
 import "../../styles/Room/RoomScreen.css";
 
@@ -107,7 +108,7 @@ export default function RoomScreen() {
     const handleStateUpdate = (newState) => {
       // Check for injected rolesMap from GAME_START
       if (newState.rolesMap && newState.rolesMap[uid]) {
-        console.log("Extracted role info from ROOM_STATE_UPDATE:", newState.rolesMap[uid]);
+        log("Extracted role info from ROOM_STATE_UPDATE:", newState.rolesMap[uid]);
         setRoleInfo(newState.rolesMap[uid]);
       }
 
