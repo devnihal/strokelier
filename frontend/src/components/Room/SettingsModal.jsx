@@ -2,25 +2,46 @@ import React, { useState } from "react";
 import Button from "../common/Button";
 import "../../styles/Room/SettingsModal.css";
 
+// Base64 encoded to hide explicit terms from source code
+const ENCODED_NSFW_WORDS = "ZnVjayxzaGl0LGJpdGNoLGFzcyxkaWNrLHB1c3N5LGN1bnQsY29jayx3aG9yZSxzbHV0LHBvcm4sc2V4LG5pZ2dlcixuaWdnYSxmYWdnb3QsYm9vYix0aXRzLHZhZ2luYSxwZW5pcyxiYXN0YXJkLHdhbmtlcix0d2F0LGplcmsscHJpY2ssY3VtLGNsaXQsZGlsZG8sc2x1dHR5LGhvcm55LHJhcGUsaW5jZXN0LGJsb3pvYixoYW5kam9iLHRpdGpvYixudWRlLG5ha2VkLG9yZ3ksdGhvdCxzcGljLGNoaW5rLGdvb2ssa2lrZSx3ZXRiYWNrLGNvb24scGVkb3BoaWxlLHBlZG8sbW9sZXN0ZXIsYW5hbCxzcGVybSxzZW1lbix2aWJyYXRvcixvcmdhc20sbWFzdHVyYmF0ZSxib25lcixhc3Nob2xlLG1vdGhlcmZ1Y2tlcixyZXRhcmQsdHJhbm55LGR5a2Usc2thbmssc2thbmt5LGhvb2tlcixiaW1ibyxtaWxmLGJ1a2tha2UsZ2FuZ2JhbmcsZ2xvcnlob2xlLHNjaGxvbmcscGVja2VyLGNhbWVsdG9lLGZhcCxqaXp6LHNtZWdtYSxyaW1qb2Isc2Nyb3RlLHNjcm90dW0sdGVzdGljbGUsbnV0YmFnLHRpdHR5LHRpdHRpZXMsYnV0dHBsdWcsYnV0dGhvbGU=";
+const NSFW_WORDS = atob(ENCODED_NSFW_WORDS).split(',');
+const nsfwRegex = new RegExp(`\\b(${NSFW_WORDS.join('|')})\\b`, 'gi');
+
 export default function SettingsModal({ settings, onClose, onSave }) {
   const [tempSettings, setTempSettings] = useState({
     maxPlayers: settings.maxPlayers,
     endCondition: settings.endCondition || "rounds",
     roundsPerGame: settings.roundsPerGame,
     targetScore: settings.targetScore || 500,
-    drawTimeLimit: settings.drawTimeLimit, // null = infinite
-    strokeLimit: settings.strokeLimit, // null = infinite
+    drawTimeLimit: settings.drawTimeLimit,
+    strokeLimit: settings.strokeLimit,
     imposterCount: settings.imposterCount || 1,
     anonymousVoting: settings.anonymousVoting || false,
     wordCategories: settings.wordCategories || ["standard"],
     customWords: settings.customWords || "",
   });
 
+  const customWordsStr = tempSettings.customWords || "";
+  const nsfwMatches = [...customWordsStr.matchAll(nsfwRegex)].map(m => m[0]);
+  const hasNsfw = nsfwMatches.length > 0;
+
+  const renderHighlightedText = () => {
+    if (!customWordsStr) return null;
+    const parts = customWordsStr.split(nsfwRegex);
+    return parts.map((part, i) => {
+      if (new RegExp(`^(${NSFW_WORDS.join('|')})$`, 'i').test(part)) {
+        return <mark key={i}>{part}</mark>;
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   const updateSetting = (key, value) => {
     setTempSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
+    if (hasNsfw) return;
     onSave(tempSettings);
   };
 
@@ -194,13 +215,26 @@ export default function SettingsModal({ settings, onClose, onSave }) {
           <div className="setting-group">
             <label>Custom Words (Comma separated, overrides above)</label>
             <div className="textarea-container">
+              <div className="textarea-backdrop">
+                {renderHighlightedText()}
+              </div>
               <textarea
+                className={hasNsfw ? "has-error" : ""}
                 placeholder="e.g. apple, banana, car, mountain"
                 value={tempSettings.customWords}
                 onChange={(e) => updateSetting("customWords", e.target.value)}
+                onScroll={(e) => {
+                  if (e.target.previousSibling) {
+                    e.target.previousSibling.scrollTop = e.target.scrollTop;
+                  }
+                }}
               />
             </div>
-            <div className="nsfw-warning">No NSFW words allowed.</div>
+            {hasNsfw && (
+              <div className="nsfw-warning">
+                Remove NSFW words to save
+              </div>
+            )}
           </div>
         </div>
 
@@ -208,7 +242,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave}>
+          <Button variant="primary" onClick={handleSave} disabled={hasNsfw} style={{ opacity: hasNsfw ? 0.5 : 1 }}>
             Save
           </Button>
         </div>
