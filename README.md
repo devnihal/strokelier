@@ -84,3 +84,7 @@ If you want to contribute to Strokelier, please adhere to the following rules:
 
 4. **Socket Management**:
    - Always properly clean up socket event listeners in `useEffect` return statements to prevent memory leaks and duplicate firing upon re-renders.
+
+5. **Documentation Integrity**:
+   - Preserve all existing comments and docstrings that are unrelated to your code changes. 
+   - Ensure complex backend game logic and socket handlers remain well-documented for future maintainers.
