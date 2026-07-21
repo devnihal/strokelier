@@ -1,4 +1,5 @@
 import React from "react";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/ScoreboardSidebar.css";
 
 import DisconnectTimer from "../common/DisconnectTimer";

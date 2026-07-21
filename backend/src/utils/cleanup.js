@@ -77,14 +77,14 @@ function startCleanupWorker(io, activeRooms) {
         if (room.state === 'LOBBY' && room.players.size > 0) {
           let hasOwner = false;
           for (const p of room.players.values()) {
-            if (p.isOwner) {
+            if (p.isRoomOwner) {
               hasOwner = true;
               break;
             }
           }
           if (!hasOwner) {
             const firstPlayer = room.players.values().next().value;
-            firstPlayer.isOwner = true;
+            firstPlayer.isRoomOwner = true;
             room.ownerUid = firstPlayer.uid;
           }
         }

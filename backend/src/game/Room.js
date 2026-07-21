@@ -13,6 +13,8 @@ class Room {
   constructor(activeRooms, ownerUid) {
     this.code = generateRoomCode(activeRooms);
     this.ownerUid = ownerUid;
+    /** @type {string} Used for sticky host reclaims */
+    this.originalOwnerUid = ownerUid;
     this.players = new Map(); // uid -> Player
     this.spectators = new Map(); // uid -> { uid, socketId, name }
     this.settings = {

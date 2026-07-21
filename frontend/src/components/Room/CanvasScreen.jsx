@@ -2,22 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "../common/Button";
 import StrokeDivider from "../common/StrokeDivider";
 import ScoreboardSidebar from "./ScoreboardSidebar";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/CanvasScreen.css";
 
-// Duplicate colors locally for frontend if backend import is brittle
 const COLORS = [
-  "#B23A2E",
-  "#5C7A4A",
-  "#4C6B8A",
-  "#7A4A6B",
-  "#CBA045",
-  "#6B7580",
-  "#A85C32",
-  "#3D7A72",
-  "#C9836B",
-  "#8A8148",
-  "#7385B8",
-  "#9E5A6B",
+  '#D94132', '#5C8AB3', '#E5B85C', '#A85C32', '#C9836B', '#7385B8', 
+  '#6BB36B', '#7A4A6B', '#6B7580', '#3D7A72', '#8A8148', '#9E5A6B'
 ];
 
 export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: parentRoleInfo }) {
@@ -293,16 +283,14 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
                     <button
                       key={c}
                       className={`color-swatch ${strokeColor === c ? "active" : ""}`}
-                      style={{ backgroundColor: c }}
+                      style={{ 
+                        backgroundColor: c,
+                        '--rotation': `rotate(${getRotationForColor(c)}deg)`
+                      }}
                       onClick={() => setStrokeColor(c)}
                     />
                   ))}
                 </div>
-                {roomState.settings.strokeLimit && (
-                  <div className="tool-group stroke-limit" style={{ color: 'var(--brass)', fontFamily: 'var(--font-code)', fontSize: '12px', display: 'flex', alignItems: 'center' }}>
-                    Strokes: {localStrokeCount} / {roomState.settings.strokeLimit}
-                  </div>
-                )}
               </div>
             )}
 

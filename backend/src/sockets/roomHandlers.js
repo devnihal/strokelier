@@ -27,6 +27,16 @@ function registerRoomHandlers(io, socket, activeRooms) {
       }
 
       const uid = socket.data.uid; // Bound in auth middleware
+      
+      /**
+       * Sticky Host: Original creator instantly reclaims host upon rejoining
+       */
+      if (room.originalOwnerUid === uid && room.ownerUid !== uid) {
+        const currentOwner = room.players.get(room.ownerUid);
+        if (currentOwner) currentOwner.isRoomOwner = false;
+        room.ownerUid = uid;
+      }
+
       const isOwner = (room.ownerUid === uid);
       let player = room.getPlayer(uid);
 
@@ -159,19 +169,35 @@ function registerRoomHandlers(io, socket, activeRooms) {
         }
 
         const player = room.getPlayer(uid);
-        if (player) {
+        if (player && player.socketId === socket.id) {
           if (room.state === 'LOBBY') {
-            room.removePlayer(uid);
-            
-            // Immediate ownership transfer if owner left in lobby
-            if (room.ownerUid === uid && room.players.size > 0) {
-              const nextOwner = Array.from(room.players.values())[0];
-              if (nextOwner) {
-                room.ownerUid = nextOwner.uid;
-                nextOwner.isRoomOwner = true;
-              }
+            if (room.ownerUid === uid) {
+              /** 15s grace period for host in lobby */
+              player.connected = false;
+              player.disconnectTime = Date.now();
+              stateChanged = true;
+
+              setTimeout(() => {
+                const currentRoom = activeRooms.get(roomCode);
+                if (currentRoom && currentRoom.state === 'LOBBY') {
+                  const p = currentRoom.getPlayer(uid);
+                  if (p && !p.connected) {
+                    currentRoom.removePlayer(uid);
+                    if (currentRoom.ownerUid === uid && currentRoom.players.size > 0) {
+                      const nextOwner = Array.from(currentRoom.players.values())[0];
+                      if (nextOwner) {
+                        currentRoom.ownerUid = nextOwner.uid;
+                        nextOwner.isRoomOwner = true;
+                      }
+                    }
+                    io.to(roomCode).emit('ROOM_STATE_UPDATE', currentRoom.toPublicState());
+                  }
+                }
+              }, 15000);
+            } else {
+              room.removePlayer(uid);
+              stateChanged = true;
             }
-            stateChanged = true;
           } else {
             player.connected = false;
             player.disconnectTime = Date.now();

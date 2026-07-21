@@ -11,9 +11,15 @@ export const getRotationForColor = (color) => {
   
   let hash = 0;
   for (let i = 0; i < color.length; i++) {
-    hash = color.charCodeAt(i) + ((hash << 5) - hash);
+    hash = Math.imul(31, hash) + color.charCodeAt(i) | 0;
   }
   
-  // Convert hash to a positive degree between 0 and 359
+  /** Strong integer mixing to fiercely disperse the angles */
+  hash ^= hash >>> 16;
+  hash = Math.imul(hash, 2246822507);
+  hash ^= hash >>> 13;
+  hash = Math.imul(hash, 3266489909);
+  hash ^= hash >>> 16;
+  
   return Math.abs(hash) % 360;
 };

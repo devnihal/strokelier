@@ -116,9 +116,21 @@
   width: 100%;
   margin-top: 16px;
   padding: 16px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.drawing-tools::before {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--studio-wall);
   border: 1px solid var(--bone-muted);
   border-radius: 8px;
+  z-index: -1;
+  filter: url(#sketch-filter-1);
+  pointer-events: none;
 }
 
 .tool-group {
@@ -140,6 +152,7 @@
   -webkit-appearance: none;
   background: transparent;
   margin: 10px 0;
+  filter: url(#sketch-filter-1);
 }
 
 .tool-group input[type="range"]:focus {
@@ -199,26 +212,30 @@
 }
 
 .tool-group.colors {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 32px);
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .tool-group.colors .color-swatch {
-  width: 32px;
-  height: 32px;
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
   border-radius: 42% 58% 55% 45% / 45% 42% 58% 55%;
   border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.1s;
-  transform: rotate(-3deg);
+  transform: var(--rotation, rotate(0deg));
+  filter: url(#sketch-filter-4);
 }
 
 .tool-group.colors .color-swatch:hover {
-  transform: scale(1.1);
+  transform: var(--rotation, rotate(-3deg)) scale(1.1);
 }
 
 .tool-group.colors .color-swatch.active {
   border-color: var(--bone);
-  transform: scale(1.15) rotate(5deg);
+  transform: var(--rotation, rotate(-3deg)) scale(1.15);
 }
