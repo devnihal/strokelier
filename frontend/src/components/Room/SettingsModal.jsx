@@ -17,7 +17,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
     drawTimeLimit: settings.drawTimeLimit,
     strokeLimit: settings.strokeLimit,
     imposterCount: settings.imposterCount || 1,
-    anonymousVoting: settings.anonymousVoting || false,
+    anonymousVoting: settings.anonymousVoting !== undefined ? settings.anonymousVoting : true,
     wordCategories: settings.wordCategories || ["standard"],
     customWords: settings.customWords || "",
   });
@@ -74,6 +74,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
               min="3"
               max="12"
               value={tempSettings.maxPlayers}
+              style={{ '--progress': `${((tempSettings.maxPlayers - 3) / 9) * 100}%` }}
               onChange={(e) =>
                 updateSetting("maxPlayers", Number(e.target.value))
               }
@@ -100,6 +101,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
                 min="1"
                 max="10"
                 value={tempSettings.roundsPerGame}
+                style={{ '--progress': `${((tempSettings.roundsPerGame - 1) / 9) * 100}%` }}
                 onChange={(e) =>
                   updateSetting("roundsPerGame", Number(e.target.value))
                 }
@@ -114,6 +116,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
                 max="2000"
                 step="100"
                 value={tempSettings.targetScore}
+                style={{ '--progress': `${((tempSettings.targetScore - 100) / 1900) * 100}%` }}
                 onChange={(e) =>
                   updateSetting("targetScore", Number(e.target.value))
                 }
@@ -138,6 +141,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
                   ? 0
                   : tempSettings.drawTimeLimit
               }
+              style={{ '--progress': `${((tempSettings.drawTimeLimit === null ? 0 : tempSettings.drawTimeLimit) / 90) * 100}%` }}
               onChange={(e) => {
                 const val = Number(e.target.value);
                 updateSetting("drawTimeLimit", val === 0 ? null : val);
@@ -159,6 +163,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
               value={
                 tempSettings.strokeLimit === null ? 0 : tempSettings.strokeLimit
               }
+              style={{ '--progress': `${((tempSettings.strokeLimit === null ? 0 : tempSettings.strokeLimit) / 10) * 100}%` }}
               onChange={(e) => {
                 const val = Number(e.target.value);
                 updateSetting("strokeLimit", val === 0 ? null : val);
@@ -173,6 +178,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
               min="1"
               max="3"
               value={tempSettings.imposterCount}
+              style={{ '--progress': `${((tempSettings.imposterCount - 1) / 2) * 100}%` }}
               onChange={(e) =>
                 updateSetting("imposterCount", Number(e.target.value))
               }

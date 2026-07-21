@@ -23,7 +23,7 @@ class Room {
       drawTimeLimit: null, // null = infinite
       strokeLimit: 1, // null = infinite
       imposterCount: 1,
-      anonymousVoting: false,
+      anonymousVoting: true,
       wordCategories: ['standard', 'animals', 'objects', 'actions', 'places', 'food'],
       customWords: "",
       targetScore: 500,
