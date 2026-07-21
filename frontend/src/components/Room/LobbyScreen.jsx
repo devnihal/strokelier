@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "../common/Button";
 import DisconnectTimer from "../common/DisconnectTimer";
 import SettingsModal from "./SettingsModal";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/LobbyScreen.css";
 
 export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
@@ -150,18 +151,36 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                     className={`swatch ${isSelected ? "selected" : ""} ${isTaken ? "taken" : ""}`}
                     style={{
                       backgroundColor: c,
-                      cursor: isTaken ? "not-allowed" : "pointer"
+                      cursor: isTaken ? "not-allowed" : "pointer",
+                      transform: `rotate(${getRotationForColor(c)}deg)`,
+                      position: 'relative'
                     }}
                     onClick={() => {
                       if (!isTaken) socket.emit("UPDATE_COLOR", { color: c });
                     }}
                   >
-                    {isTaken && (
-                      <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%', stroke: 'var(--graphite)', strokeWidth: 3 }}>
-                        <line x1="4" y1="4" x2="20" y2="20" />
-                        <line x1="20" y1="4" x2="4" y2="20" />
-                      </svg>
-                    )}
+                    <svg 
+                      className={`swatch-scribble ${isTaken ? 'is-taken' : ''}`}
+                      viewBox="0 0 24 24" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        transform: `rotate(${-getRotationForColor(c) + 45}deg)`,
+                        pointerEvents: 'none'
+                      }}>
+                      <path 
+                        d="M 2 12 Q 3 2 4 15 T 7 4 T 9 19 T 12 3 T 14 21 T 17 5 T 19 18 T 22 8" 
+                        stroke="var(--graphite)" 
+                        strokeWidth="1.5" 
+                        fill="none" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                        pathLength="100"
+                      />
+                    </svg>
                   </div>
                 );
               })}

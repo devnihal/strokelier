@@ -124,7 +124,7 @@ function registerRoomHandlers(io, socket, activeRooms) {
       const room = activeRooms.get(roomCode);
       if (room && room.ownerUid === uid && room.state === 'LOBBY') {
         if (settings.maxPlayers !== undefined) {
-          room.settings.maxPlayers = Math.max(3, Math.min(20, settings.maxPlayers));
+          room.settings.maxPlayers = Math.max(3, Math.min(12, settings.maxPlayers));
         }
         if (settings.roundsPerGame !== undefined) {
           room.settings.roundsPerGame = Math.max(1, Math.min(10, settings.roundsPerGame));

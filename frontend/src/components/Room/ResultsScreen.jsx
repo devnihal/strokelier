@@ -2,6 +2,7 @@ import React from "react";
 import Button from "../common/Button";
 import StrokeDivider from "../common/StrokeDivider";
 import Confetti from "react-confetti";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/ResultsScreen.css";
 
 export default function ResultsScreen({ roomState, myPlayer, socket }) {
@@ -145,7 +146,7 @@ export default function ResultsScreen({ roomState, myPlayer, socket }) {
             >
               {isImposter && stampText && <div className={`stamp ${stampClass}`}>{stampText}</div>}
 
-              <div className="seal" style={{ backgroundColor: p.color }}></div>
+              <div className="seal" style={{ backgroundColor: p.color, transform: `rotate(${getRotationForColor(p.color)}deg)` }}></div>
               <div className="artist-title">{p.name}</div>
               <div className="artist-points">{increment >= 0 ? `+${increment}` : increment} PTS</div>
 
@@ -154,7 +155,7 @@ export default function ResultsScreen({ roomState, myPlayer, socket }) {
                   <p style={{ fontSize: '10px', color: 'var(--bone-muted)', margin: '0 0 6px 0', fontFamily: 'var(--font-code)', textTransform: 'uppercase' }}>Caught By:</p>
                   <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     {detectives.map(det => (
-                      <div key={det.uid} className="seal" style={{ backgroundColor: det.color, width: '16px', height: '16px', margin: 0 }} title={det.name} />
+                      <div key={det.uid} className="seal" style={{ backgroundColor: det.color, width: '16px', height: '16px', margin: 0, transform: `rotate(${getRotationForColor(det.color)}deg)` }} title={det.name} />
                     ))}
                   </div>
                 </div>

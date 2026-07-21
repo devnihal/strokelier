@@ -104,7 +104,12 @@ export default function ScoreboardSidebar({
               >
                 <div
                   className="color-swatch"
-                  style={{ backgroundColor: p.color, filter: !p.connected ? 'grayscale(1)' : 'none', zIndex: 1 }}
+                  style={{ 
+                    backgroundColor: p.color, 
+                    filter: !p.connected ? 'grayscale(1)' : 'none', 
+                    zIndex: 1,
+                    transform: `rotate(${getRotationForColor(p.color)}deg)`
+                  }}
                 ></div>
                 {isOwner && (
                   <div

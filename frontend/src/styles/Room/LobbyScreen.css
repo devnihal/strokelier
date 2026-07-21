@@ -183,3 +183,22 @@
   opacity: 0.4;
   filter: grayscale(0.8);
 }
+
+.swatch-scribble {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.swatch-scribble path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.4s ease-out;
+}
+
+.swatch-scribble.is-taken {
+  opacity: 0.85;
+}
+
+.swatch-scribble.is-taken path {
+  stroke-dashoffset: 0;
+}

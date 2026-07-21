@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "../common/Button";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/VotingScreen.css";
 
 export default function VotingScreen({ roomState, myPlayer, socket }) {
@@ -101,6 +102,7 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
                   className="seal"
                   style={{
                     backgroundColor: p.color,
+transform: `rotate(${getRotationForColor(p.color)}deg)`,
                     width: "32px",
                     height: "32px",
                   }}
@@ -153,14 +155,14 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
 
               return (
                 <div key={voterUid} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--studio-wall-alt)', border: '1px solid var(--hairline)', padding: '4px 8px', borderRadius: '16px' }}>
-                  <div className="seal" style={{ width: '12px', height: '12px', backgroundColor: voter.color, filter: 'none', margin: 0 }}></div>
+                  <div className="seal" style={{ width: '12px', height: '12px', backgroundColor: voter.color, filter: 'none', margin: 0, transform: `rotate(${getRotationForColor(voter.color)}deg)` }}></div>
                   <span style={{ fontFamily: 'var(--font-ui)', fontSize: '11px', color: 'var(--bone-muted)' }}>{voter.name}</span>
                   
                   {!isAnonymous && votedTargets.length > 0 && (
                     <>
                       <span style={{ color: 'var(--bone-muted)', fontFamily: 'var(--font-code)', fontSize: '10px', margin: '0 4px' }}>→</span>
                       {votedTargets.map(target => (
-                        <div key={target.uid} className="seal" style={{ width: '12px', height: '12px', backgroundColor: target.color, filter: 'none', margin: 0 }} title={target.name}></div>
+                        <div key={target.uid} className="seal" style={{ width: '12px', height: '12px', backgroundColor: target.color, filter: 'none', margin: 0, transform: `rotate(${getRotationForColor(target.color)}deg)` }} title={target.name}></div>
                       ))}
                     </>
                   )}

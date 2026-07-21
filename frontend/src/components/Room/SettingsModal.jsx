@@ -72,7 +72,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
             <input
               type="range"
               min="3"
-              max="20"
+              max="12"
               value={tempSettings.maxPlayers}
               onChange={(e) =>
                 updateSetting("maxPlayers", Number(e.target.value))

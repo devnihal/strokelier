@@ -3,6 +3,7 @@ import confetti from "canvas-confetti";
 import { Crown } from "lucide-react";
 import Button from "../common/Button";
 import StrokeDivider from "../common/StrokeDivider";
+import { getRotationForColor } from "../../utils/colorUtils";
 import "../../styles/Room/LeaderboardScreen.css";
 
 export default function LeaderboardScreen({ roomState, myPlayer, socket }) {
@@ -72,8 +73,7 @@ export default function LeaderboardScreen({ roomState, myPlayer, socket }) {
       <div className="podium-container">
         {podiumOrder.map((p, i) => {
           // deterministic pseudo-random rotation based on rank
-          const rotate = (p.rank % 2 === 0 ? 1 : -1) * (5 + (p.score % 15));
-          return (
+                    return (
             <div key={p.uid} className={`podium-place rank-${p.rank}`}>
               <div className="podium-player-info">
                 {p.rank === 1 && (
@@ -95,7 +95,7 @@ export default function LeaderboardScreen({ roomState, myPlayer, socket }) {
                   className="podium-seal" 
                   style={{ 
                     backgroundColor: p.color,
-                    transform: `rotate(${rotate}deg)`
+                    transform: `rotate(${getRotationForColor(p.color)}deg)`
                   }}
                 ></div>
                 <div className="podium-name">{p.name}</div>
@@ -112,15 +112,14 @@ export default function LeaderboardScreen({ roomState, myPlayer, socket }) {
       {rest.length > 0 && (
         <div className="leaderboard-list">
           {rest.map((p, index) => {
-            const rotate = (index % 2 === 0 ? 1 : -1) * (5 + (p.score % 15));
-            return (
+                        return (
               <div key={p.uid} className="leaderboard-row">
                 <span className="row-rank">{index + 4}.</span>
                 <div 
                   className="row-seal" 
                   style={{ 
                     backgroundColor: p.color,
-                    transform: `rotate(${rotate}deg)`
+                    transform: `rotate(${getRotationForColor(p.color)}deg)`
                   }}
                 ></div>
                 <span className="row-name">{p.name}</span>
