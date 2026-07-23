@@ -81,48 +81,21 @@ export default function SettingsModal({ settings, onClose, onSave }) {
             />
           </div>
 
-          <div className="setting-group">
-            <label>Win Condition</label>
-            <div 
-              className={`segment-control ${tempSettings.endCondition}`}
-              onClick={() => updateSetting('endCondition', tempSettings.endCondition === 'rounds' ? 'score' : 'rounds')}
-            >
-              <div className="segment-indicator"></div>
-              <span className={`segment-label ${tempSettings.endCondition === 'rounds' ? 'active' : ''}`}>Play by Rounds</span>
-              <span className={`segment-label ${tempSettings.endCondition === 'score' ? 'active' : ''}`}>Target Score</span>
-            </div>
-          </div>
 
-          {tempSettings.endCondition === "rounds" ? (
-            <div className="setting-group indent">
-              <label>Rounds: {tempSettings.roundsPerGame}</label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={tempSettings.roundsPerGame}
-                style={{ '--progress': `${((tempSettings.roundsPerGame - 1) / 9) * 100}%` }}
-                onChange={(e) =>
-                  updateSetting("roundsPerGame", Number(e.target.value))
-                }
-              />
-            </div>
-          ) : (
-            <div className="setting-group indent">
-              <label>Target Score: {tempSettings.targetScore}</label>
-              <input
-                type="range"
-                min="100"
-                max="2000"
-                step="100"
-                value={tempSettings.targetScore}
-                style={{ '--progress': `${((tempSettings.targetScore - 100) / 1900) * 100}%` }}
-                onChange={(e) =>
-                  updateSetting("targetScore", Number(e.target.value))
-                }
-              />
-            </div>
-          )}
+
+          <div className="setting-group">
+            <label>Rounds: {tempSettings.roundsPerGame}</label>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              value={tempSettings.roundsPerGame}
+              style={{ '--progress': `${((tempSettings.roundsPerGame - 1) / 9) * 100}%` }}
+              onChange={(e) =>
+                updateSetting("roundsPerGame", Number(e.target.value))
+              }
+            />
+          </div>
 
           <div className="setting-group">
             <label>
@@ -183,9 +156,7 @@ export default function SettingsModal({ settings, onClose, onSave }) {
                 updateSetting("imposterCount", Number(e.target.value))
               }
             />
-          </div>
-
-          <div className="setting-group toggle-group">
+          </div>          <div className="setting-group toggle-group">
             <span>Anonymous Voting</span>
             <label className="toggle-switch">
               <input

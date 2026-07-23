@@ -29,10 +29,12 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 16px;
+  gap: 8px;
   margin-top: 100px;
   margin-bottom: 48px;
   height: 250px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .podium-place {
@@ -41,7 +43,7 @@
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  width: 120px;
+  width: 110px;
 }
 
 .podium-player-info {
@@ -78,7 +80,8 @@
 }
 
 .podium-block {
-  width: 100%;
+  width: 80px;
+  margin: 0 auto;
   background: var(--studio-wall);
   border: 2px solid var(--brass);
   position: relative;
@@ -96,7 +99,7 @@
 }
 
 .podium-place.rank-1 .podium-block {
-  height: 160px;
+  height: 110px;
   background: linear-gradient(135deg, var(--studio-wall) 0%, rgba(200, 150, 50, 0.1) 100%);
 }
 
@@ -106,11 +109,11 @@
 }
 
 .podium-place.rank-2 .podium-block {
-  height: 110px;
+  height: 75px;
 }
 
 .podium-place.rank-3 .podium-block {
-  height: 70px;
+  height: 50px;
 }
 
 .leaderboard-list {
