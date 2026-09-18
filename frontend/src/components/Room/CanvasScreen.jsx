@@ -3,6 +3,7 @@ import Button from "../common/Button";
 import StrokeDivider from "../common/StrokeDivider";
 import ScoreboardSidebar from "./ScoreboardSidebar";
 import { getRotationForColor } from "../../utils/colorUtils";
+import { useAudio } from "../../hooks/useAudio";
 import "../../styles/Room/CanvasScreen.css";
 
 const COLORS = [
@@ -11,12 +12,20 @@ const COLORS = [
 ];
 
 export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: parentRoleInfo }) {
+  const { sfx } = useAudio();
   const canvasRef = useRef(null);
 
   const [roleInfo, setRoleInfo] = useState(parentRoleInfo || { role: "artist", word: null });
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasPendingStroke, setHasPendingStroke] = useState(false);
   const [showScribbleWarning, setShowScribbleWarning] = useState(false);
+
+  // Stop pencil sound if unmounting while drawing
+  useEffect(() => {
+    return () => {
+      sfx.pencilUp();
+    };
+  }, [sfx]);
   
   // Vandalism Guard variables
   const touchedCells = useRef(new Set());
@@ -194,6 +203,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
     if (!isMyTurn || hasPendingStroke) return;
     if (roomState.settings.strokeLimit && localStrokeCount >= roomState.settings.strokeLimit) return;
     setIsDrawing(true);
+    sfx.pencilDown();
     const pt = getNormPos(e);
     setLocalPendingPoints([pt]);
     
@@ -227,13 +237,23 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
     const cellY = Math.max(0, Math.min(9, Math.floor(pt.y * 10)));
     touchedCells.current.add(`${cellX},${cellY}`);
 
-    // 2. Distance Tracking
+    // 2. Distance Tracking & Motion Audio
+    let delta = 0;
     if (lastPoint.current) {
       const dx = pt.x - lastPoint.current.x;
       const dy = pt.y - lastPoint.current.y;
-      currentStrokeDistance.current += Math.hypot(dx, dy);
+      delta = Math.hypot(dx, dy);
+      currentStrokeDistance.current += delta;
     }
     lastPoint.current = pt;
+
+    // Only produce scratch sound if there is actual motion across paper!
+    // If movement pauses mid-stroke, sound stops immediately.
+    if (delta > 0.0008) {
+      sfx.pencilDraw(delta);
+    } else {
+      sfx.pencilStop();
+    }
 
     // 3. Bounding Box Tracking
     boundingBox.current.minX = Math.min(boundingBox.current.minX, pt.x);
@@ -259,6 +279,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
 
     // If 3 or more anomalies trigger, it's definitely vandalism
     if (vandalismScore >= 3) {
+      sfx.warningBuzz();
       handlePointerUp(e);
       handleRetry(); // Wipe the stroke
       setShowScribbleWarning(true);
@@ -268,18 +289,21 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
   const handlePointerUp = (e) => {
     if (!isDrawing) return;
     setIsDrawing(false);
+    sfx.pencilUp();
     setHasPendingStroke(true);
     socket.emit("DRAW_STROKE_END");
     e.target.releasePointerCapture(e.pointerId);
   };
 
   const handleRetry = () => {
+    sfx.strokeRetry();
     socket.emit("DRAW_RETRY");
     setLocalPendingPoints([]);
     setHasPendingStroke(false);
   };
 
   const handleCommitStroke = () => {
+    sfx.strokeCommit();
     socket.emit("DRAW_COMMIT_STROKE");
     setLocalPendingPoints([]);
     setHasPendingStroke(false);
@@ -287,6 +311,7 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
   };
 
   const handleNextPlayer = () => {
+    sfx.strokeCommit();
     socket.emit("DRAW_NEXT_PLAYER");
     setLocalPendingPoints([]);
     setHasPendingStroke(false);
@@ -351,7 +376,10 @@ export default function CanvasScreen({ roomState, myPlayer, socket, roleInfo: pa
                           backgroundColor: c,
                           '--rotation': `rotate(${getRotationForColor(c)}deg)`
                         }}
-                        onClick={() => setStrokeColor(c)}
+                        onClick={() => {
+                          sfx.colorSelect();
+                          setStrokeColor(c);
+                        }}
                       />
                     ))}
                   </div>

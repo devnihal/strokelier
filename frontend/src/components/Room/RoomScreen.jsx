@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Volume2, VolumeX } from "lucide-react";
 import { useSocket } from "../../hooks/useSocket";
 import { usePlayerSession } from "../../context/PlayerSessionContext";
+import { useAudio } from "../../hooks/useAudio";
 import LobbyScreen from "./LobbyScreen";
 import CanvasScreen from "./CanvasScreen";
 import VotingScreen from "./VotingScreen";
@@ -12,6 +14,7 @@ import "../../styles/Room/RoomScreen.css";
 
 function CountdownOverlay({ seconds, message, onComplete }) {
   const [count, setCount] = useState(seconds);
+  const { sfx } = useAudio();
 
   const onCompleteRef = React.useRef(onComplete);
 
@@ -21,12 +24,14 @@ function CountdownOverlay({ seconds, message, onComplete }) {
 
   useEffect(() => {
     if (count <= 0) {
+      sfx.countdownFinish();
       onCompleteRef.current();
       return;
     }
+    sfx.countdownTick();
     const timer = setTimeout(() => setCount((c) => c - 1), 1000);
     return () => clearTimeout(timer);
-  }, [count]);
+  }, [count, sfx]);
 
   return (
     <div className="countdown-overlay">
@@ -45,6 +50,7 @@ export default function RoomScreen() {
   const socket = useSocket();
   const { uid } = usePlayerSession();
   const navigate = useNavigate();
+  const { sfx, isMuted, toggleMute } = useAudio();
 
   const [roomState, setRoomState] = useState(null);
   const [error, setError] = useState(null);
@@ -143,6 +149,7 @@ export default function RoomScreen() {
             setRoleInfo(null);
           }
           // Normal crossfade for other state changes
+          sfx.screenTransition();
           setFadeClass("fade-out");
           setTimeout(() => {
             setDisplayedState(newState.state);
@@ -229,9 +236,15 @@ export default function RoomScreen() {
     // If transitioning to DRAWING and we have role info, show the role popup
     if (countdown.targetState === "DRAWING" && roleInfo) {
       setCountdown(null);
+      if (roleInfo.role === 'imposter') {
+        sfx.roleRevealImposter();
+      } else {
+        sfx.roleRevealArtist();
+      }
       setShowRolePopup(true);
       return;
     }
+    sfx.screenTransition();
     setFadeClass("fade-out");
     setTimeout(() => {
       setDisplayedState(countdown.targetState);
@@ -241,6 +254,7 @@ export default function RoomScreen() {
   };
 
   const handleDismissRolePopup = () => {
+    sfx.screenTransition();
     setShowRolePopup(false);
     setFadeClass("fade-out");
     setTimeout(() => {
@@ -300,6 +314,15 @@ export default function RoomScreen() {
 
   return (
     <div className="room-screen">
+      <button
+        className="audio-toggle-btn"
+        onClick={toggleMute}
+        title={isMuted ? "Unmute sound effects" : "Mute sound effects"}
+        aria-label={isMuted ? "Unmute sound effects" : "Mute sound effects"}
+      >
+        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+      </button>
+
       {isSpectator && (
         <div className="spectator-banner" style={{ background: 'var(--ink-blue)', color: 'var(--bone)', padding: '8px 16px', textAlign: 'center', fontFamily: 'var(--font-ui)', fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', width: '100%', zIndex: 100 }}>
           Spectator Mode - You will join the next game

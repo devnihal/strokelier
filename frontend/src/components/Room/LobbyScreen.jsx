@@ -1,15 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "../common/Button";
 import DisconnectTimer from "../common/DisconnectTimer";
 import SettingsModal from "./SettingsModal";
 import { getRotationForColor } from "../../utils/colorUtils";
+import { useAudio } from "../../hooks/useAudio";
 import "../../styles/Room/LobbyScreen.css";
 
 export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
+  const { sfx } = useAudio();
   const [showSettings, setShowSettings] = useState(false);
 
   const players = Object.values(roomState.players);
   const slots = Array(roomState.settings.maxPlayers).fill(null);
+
+  // Play entrance chime when new players join the lobby
+  const prevPlayerCount = useRef(players.length);
+  useEffect(() => {
+    if (players.length > prevPlayerCount.current) {
+      sfx.playerJoined();
+    }
+    prevPlayerCount.current = players.length;
+  }, [players.length, sfx]);
 
   // Validation Logic
   const activePlayers = players.length;
@@ -28,10 +39,12 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
   }
 
   const handleStartGame = () => {
+    sfx.voteCast();
     socket.emit("GAME_START");
   };
 
   const handleCopyCode = () => {
+    sfx.uiTap();
     navigator.clipboard.writeText(roomState.code);
   };
 
@@ -43,7 +56,10 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
             <h3 style={{ margin: 0, padding: 0, fontSize: '20px' }}>Session Ledger</h3>
             {isOwner && (
               <button 
-                onClick={() => setShowSettings(true)}
+                onClick={() => {
+                  sfx.screenTransition();
+                  setShowSettings(true);
+                }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', color: 'var(--brass)' }}
                 title="Settings"
               >
@@ -109,7 +125,10 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                 )}
                 {roomState.gamesPlayed >= 1 && (
                   <Button
-                    onClick={() => socket.emit("GAME_END")}
+                    onClick={() => {
+                      sfx.voteCast();
+                      socket.emit("GAME_END");
+                    }}
                     variant="danger"
                     style={{ width: "100%", marginTop: "12px", borderColor: "var(--crimson)", color: "var(--crimson)" }}
                   >
@@ -156,7 +175,10 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
                       position: 'relative'
                     }}
                     onClick={() => {
-                      if (!isTaken) socket.emit("UPDATE_COLOR", { color: c });
+                      if (!isTaken) {
+                        sfx.colorSelect();
+                        socket.emit("UPDATE_COLOR", { color: c });
+                      }
                     }}
                   >
                     <svg 
@@ -235,8 +257,12 @@ export default function LobbyScreen({ roomState, isOwner, myPlayer, socket }) {
       {showSettings && (
         <SettingsModal 
           settings={roomState.settings} 
-          onClose={() => setShowSettings(false)} 
+          onClose={() => {
+            sfx.screenTransition();
+            setShowSettings(false);
+          }} 
           onSave={(newSettings) => {
+            sfx.strokeCommit();
             socket.emit("UPDATE_SETTINGS", newSettings);
             setShowSettings(false);
           }}

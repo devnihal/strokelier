@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../common/Button";
 import StrokeDivider from "../common/StrokeDivider";
 import Confetti from "react-confetti";
 import { getRotationForColor } from "../../utils/colorUtils";
+import { useAudio } from "../../hooks/useAudio";
 import "../../styles/Room/ResultsScreen.css";
 
 export default function ResultsScreen({ roomState, myPlayer, socket }) {
+  const { sfx } = useAudio();
   const isOwner = myPlayer?.isRoomOwner;
   const imposterUids = roomState.imposterUids || [];
   const word = roomState.currentWord;
@@ -47,6 +49,21 @@ export default function ResultsScreen({ roomState, myPlayer, socket }) {
   const iCaughtSome = !amImpostor && caughtByMeCount > 0 && caughtByMeCount < imposterUids.length;
   
   const showConfetti = iEscaped || iCaughtAll;
+
+  useEffect(() => {
+    if (showConfetti) {
+      sfx.resultVictory();
+    } else {
+      sfx.resultDefeat();
+    }
+
+    if (imposterUids.length > 0) {
+      const stampTimer = setTimeout(() => {
+        sfx.stampReveal();
+      }, 450);
+      return () => clearTimeout(stampTimer);
+    }
+  }, [sfx, showConfetti, imposterUids.length]);
 
   return (
     <div className="results-screen">

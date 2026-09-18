@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import Button from "../common/Button";
+import { useAudio } from "../../hooks/useAudio";
 import "../../styles/Room/SettingsModal.css";
 
-// Base64 encoded to hide explicit terms from source code
 // Base64 encoded to hide explicit terms from source code
 const ENCODED_NSFW_WORDS = "ZnVjayxzaGl0LGJpdGNoLGFzcyxkaWNrLHB1c3N5LGN1bnQsY29jayx3aG9yZSxzbHV0LHBvcm4sc2V4LG5pZ2dlcixuaWdnYSxmYWdnb3QsYm9vYix0aXRzLHZhZ2luYSxwZW5pcyxiYXN0YXJkLHdhbmtlcix0d2F0LGplcmsscHJpY2ssY3VtLGNsaXQsZGlsZG8sc2x1dHR5LGhvcm55LHJhcGUsaW5jZXN0LGJsb3dqb2IsaGFuZGpvYix0aXRqb2IsbnVkZSxuYWtlZCxvcmd5LHRob3Qsc3BpYyxjaGluayxnb29rLGtpa2Usd2V0YmFjayxjb29uLHBlZG9waGlsZSxwZWRvLG1vbGVzdGVyLGFuYWwsc3Blcm0sc2VtZW4sdmlicmF0b3Isb3JnYXNtLG1hc3R1cmJhdGUsYm9uZXIsYXNzaG9sZSxtb3RoZXJmdWNrZXIscmV0YXJkLHRyYW5ueSxkeWtlLHNrYW5rLHNrYW5reSxob29rZXIsYmltYm8sbWlsZixidWtrYWtlLGdhbmdiYW5nLGdsb3J5aG9sZSxzY2hsb25nLHBlY2tlcixjYW1lbHRvZSxmYXAsaml6eixzbWVnbWEscmltam9iLHNjcm90ZSxzY3JvdHVtLHRlc3RpY2xlLG51dGJhZyx0aXR0eSx0aXR0aWVzLGJ1dHRwbHVnLGJ1dHRob2xlLGRlZXB0aHJvYXQsZG9nZ3lzdHlsZSxtaXNzaW9uYXJ5LGNvd2dpcmwsc2Npc3NvcmluZyxmaXN0aW5nLHBlZ2dpbmcsdGVhYmFnZ2luZyxjcmVhbXBpZSxzcXVpcnQsZmFjaWFsLDY5LGJkc20sa2luayxmZXRpc2gsYm9uZGFnZSxzYWRpc20sbWFzb2NoaXNt";
 const NSFW_WORDS = atob(ENCODED_NSFW_WORDS).split(',');
 const nsfwRegex = new RegExp(`\\b(${NSFW_WORDS.join('|')})\\b`, 'gi');
 
 export default function SettingsModal({ settings, onClose, onSave }) {
+  const { sfx } = useAudio();
   const [tempSettings, setTempSettings] = useState({
     maxPlayers: settings.maxPlayers,
     endCondition: settings.endCondition || "rounds",
@@ -38,22 +39,28 @@ export default function SettingsModal({ settings, onClose, onSave }) {
   };
 
   const updateSetting = (key, value) => {
+    sfx.uiTap();
     setTempSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
     if (hasNsfw) return;
+    sfx.strokeCommit();
     onSave(tempSettings);
   };
 
   const toggleCategory = (cat) => {
+    sfx.uiTap();
     if (tempSettings.wordCategories.includes(cat)) {
-      updateSetting(
-        "wordCategories",
-        tempSettings.wordCategories.filter((c) => c !== cat),
-      );
+      setTempSettings((prev) => ({
+        ...prev,
+        wordCategories: prev.wordCategories.filter((c) => c !== cat),
+      }));
     } else {
-      updateSetting("wordCategories", [...tempSettings.wordCategories, cat]);
+      setTempSettings((prev) => ({
+        ...prev,
+        wordCategories: [...prev.wordCategories, cat],
+      }));
     }
   };
 
@@ -217,7 +224,10 @@ export default function SettingsModal({ settings, onClose, onSave }) {
         </div>
 
         <div className="settings-footer">
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={() => {
+            sfx.screenTransition();
+            onClose();
+          }}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleSave} disabled={hasNsfw} style={{ opacity: hasNsfw ? 0.5 : 1 }}>

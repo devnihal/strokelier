@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "../common/Button";
 import { getRotationForColor } from "../../utils/colorUtils";
+import { useAudio } from "../../hooks/useAudio";
 import "../../styles/Room/VotingScreen.css";
 
 export default function VotingScreen({ roomState, myPlayer, socket }) {
+  const { sfx } = useAudio();
   const [selectedUids, setSelectedUids] = useState([]);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const canvasRef = useRef(null);
@@ -20,6 +22,7 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
 
   const toggleSelection = (uid) => {
     if (hasSubmitted || !myPlayer) return;
+    sfx.suspectSelect();
     if (selectedUids.includes(uid)) {
       setSelectedUids(selectedUids.filter(id => id !== uid));
     } else {
@@ -34,6 +37,7 @@ export default function VotingScreen({ roomState, myPlayer, socket }) {
 
   const handleVoteSubmit = () => {
     if (selectedUids.length !== maxSelections) return;
+    sfx.voteCast();
     socket.emit("VOTE_SUBMIT", { votedUids: selectedUids });
     setHasSubmitted(true);
   };
